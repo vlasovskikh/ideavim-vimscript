@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
@@ -30,7 +31,6 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.undo.UndoManager;
-import com.maddyhome.idea.vim.KeyHandler;
 
 /**
  *
@@ -112,11 +112,27 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
                 logger.debug("multikey undo - exit visual");
                 CommandGroups.getInstance().getMotion().exitVisual(editor);
             }
+            else if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0)
+            {
+                lastMode = CommandState.getInstance().getSubMode();
+                if (lastMode != Command.FLAG_MOT_LINEWISE)
+                {
+                    CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_LINEWISE);
+                }
+            }
         }
 
         public void finish()
         {
             logger.debug("finish");
+
+            if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0)
+            {
+                if (lastMode != Command.FLAG_MOT_LINEWISE)
+                {
+                    CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, lastMode);
+                }
+            }
 
             if (cmd == null || (cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0)
             {
@@ -161,6 +177,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         private Editor editor;
         private DataContext context;
         private boolean res;
+        private int lastMode;
         VisualChange change = null;
     }
 

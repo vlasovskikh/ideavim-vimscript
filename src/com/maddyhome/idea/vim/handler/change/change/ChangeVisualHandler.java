@@ -33,6 +33,7 @@ public class ChangeVisualHandler extends VisualOperatorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
     {
-        return CommandGroups.getInstance().getChange().changeRange(editor, context, range, Command.FLAG_MOT_INCLUSIVE);
+        int mode = range.isMultiple() ? Command.FLAG_MOT_BLOCKWISE : Command.FLAG_MOT_INCLUSIVE;
+        return CommandGroups.getInstance().getChange().changeRange(editor, context, range, mode);
     }
 }

@@ -57,6 +57,90 @@ public class StringHelper
         return res.toString();
     }
 
+    public static String entities(String text)
+    {
+        StringBuffer res = new StringBuffer(text.length());
+
+        for (int i = 0; i < text.length(); i++)
+        {
+            char ch = text.charAt(i);
+            switch (ch)
+            {
+                case ' ':
+                    res.append("&#32;");
+                    break;
+                case '&':
+                    res.append("&amp;");
+                    break;
+                case '\t':
+                    res.append("&#9;");
+                    break;
+                case '\n':
+                    res.append("&#10;");
+                    break;
+                case '\r':
+                    res.append("&#13;");
+                    break;
+                default:
+                    res.append(ch);
+            }
+        }
+
+        return res.toString();
+    }
+
+    public static String unentities(String text)
+    {
+        StringBuffer res = new StringBuffer(text.length());
+
+        for (int i = 0; i < text.length(); i++)
+        {
+            char ch = text.charAt(i);
+            switch (ch)
+            {
+                case '&':
+                    int semi = text.indexOf(';', i);
+                    if (semi > i)
+                    {
+                        char newch = ch;
+                        String entity = text.substring(i, semi + 1);
+                        if (entity.equals("&#32;"))
+                        {
+                            newch = ' ';
+                        }
+                        else if (entity.equals("&amp;"))
+                        {
+                            newch = '&';
+                            i = semi;
+                        }
+                        else if (entity.equals("&#9;"))
+                        {
+                            newch = '\t';
+                        }
+                        else if (entity.equals("&#10;"))
+                        {
+                            newch = '\n';
+                        }
+                        else if (entity.equals("&#13;"))
+                        {
+                            newch = '\r';
+                        }
+                        if (newch != ch)
+                        {
+                            ch = newch;
+                            i = semi;
+                        }
+                    }
+                    res.append(ch);
+                    break;
+                default:
+                    res.append(ch);
+            }
+        }
+
+        return res.toString();
+    }
+
     public static List stringToKeys(String str)
     {
         ArrayList res = new ArrayList();

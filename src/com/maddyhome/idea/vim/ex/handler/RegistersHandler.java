@@ -28,9 +28,9 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
+
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -58,7 +58,7 @@ public class RegistersHandler extends CommandHandler
             text.append(reg.getName());
 
             text.append("   ");
-            text.append(StringHelper.escape(reg.getText()).trim());
+            text.append(StringHelper.escape(reg.getText()));
             text.append("\n");
         }
 

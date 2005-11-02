@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.handler.change.delete;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
@@ -34,9 +35,18 @@ public class DeleteVisualLinesHandler extends VisualOperatorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
     {
-        range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-            EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
+        int mode = CommandState.getInstance().getSubMode();
+        if (mode == Command.FLAG_MOT_BLOCKWISE)
+        {
+            return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, mode, false);
+        }
+        else
+        {
+            range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
+                EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_LINEWISE, false);
+            return CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
+                Command.FLAG_MOT_LINEWISE, false);
+        }
     }
 }

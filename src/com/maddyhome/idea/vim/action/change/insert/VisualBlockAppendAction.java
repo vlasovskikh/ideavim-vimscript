@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.handler.copy;
+package com.maddyhome.idea.vim.action.change.insert;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -19,22 +19,15 @@ package com.maddyhome.idea.vim.handler.copy;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.handler.change.insert.VisualBlockAppendHandler;
 
 /**
- *
  */
-public class YankVisualHandler extends VisualOperatorActionHandler
+public class VisualBlockAppendAction extends EditorAction
 {
-    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
+    public VisualBlockAppendAction()
     {
-        return CommandGroups.getInstance().getCopy().yankRange(editor, context, range,
-            CommandState.getInstance().getSubMode());
+        super(new VisualBlockAppendHandler());
     }
 }

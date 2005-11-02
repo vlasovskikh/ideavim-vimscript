@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
@@ -96,18 +97,17 @@ public class RegisterGroup extends AbstractActionGroup
      * Stores text into the last register
      * @param editor The editor to get the text from
      * @param context The data context
-     * @param start The start offset of the text to store
-     * @param end The end offset of the text to store
+     * @param range The range of the text to store
      * @param type The type of copy - linewise or characterwise
      * @return true if able to store the text into the register, false if not
      */
-    public boolean storeText(Editor editor, DataContext context, int start, int end, int type, boolean isDelete, boolean isYank)
+    public boolean storeText(Editor editor, DataContext context, TextRange range, int type, boolean isDelete, boolean isYank)
     {
         if (isRegisterWritable())
         {
-            String text = EditorHelper.getText(editor, start, end);
+            String text = EditorHelper.getText(editor, range);
 
-            return storeTextInternal(editor, context, start, end, text, type, lastRegister, isDelete, isYank);
+            return storeTextInternal(editor, context, range, text, type, lastRegister, isDelete, isYank);
         }
 
         return false;
@@ -118,11 +118,14 @@ public class RegisterGroup extends AbstractActionGroup
         registers.put(new Character(register), new Register(register, type, strokes));
     }
 
-    public boolean storeTextInternal(Editor editor, DataContext context, int start, int end, String text, int type, char register, boolean isDelete, boolean isYank)
+    public boolean storeTextInternal(Editor editor, DataContext context, TextRange range, String text, int type,
+        char register, boolean isDelete, boolean isYank)
     {
         // Null register doesn't get saved
         if (lastRegister == '_') return true;
 
+        int start = range.getStartOffset();
+        int end = range.getEndOffset();
         // Normalize the start and end
         if (start > end)
         {
@@ -335,6 +338,7 @@ public class RegisterGroup extends AbstractActionGroup
      */
     public void saveData(Element element)
     {
+        logger.debug("saveData");
         Element regs = new Element("registers");
         for (Iterator iterator = registers.keySet().iterator(); iterator.hasNext();)
         {
@@ -347,9 +351,12 @@ public class RegisterGroup extends AbstractActionGroup
             if (register.isText())
             {
                 Element text = new Element("text");
-                CDATA data = new CDATA(CDATA.normalizeString(register.getText()));
+                CDATA data = new CDATA(/*CDATA.normalizeString*/(StringHelper.entities(register.getText())));
                 text.addContent(data);
                 reg.addContent(text);
+                logger.debug("register='" + register.getText() + "'");
+                logger.debug("data=" + data);
+                logger.debug("text=" + text);
             }
             else
             {
@@ -391,7 +398,7 @@ public class RegisterGroup extends AbstractActionGroup
                 if (reg.getChild("text") != null)
                 {
                     register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")),
-                        reg.getChild("text").getTextNormalize());
+                        StringHelper.unentities(reg.getChild("text").getText/*Normalize*/()));
                 }
                 else
                 {

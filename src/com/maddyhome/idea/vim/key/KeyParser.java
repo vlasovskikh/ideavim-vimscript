@@ -214,6 +214,8 @@ public class KeyParser
             //    keymap.addShortcut(ideaActName, icuts[i]);
             //}
         }
+
+        amgr.registerAction("Orig" + ideaActName, iaction);
     }
 
     public void setupActionHandler(String ideaActName, String vimActName, KeyStroke stroke)

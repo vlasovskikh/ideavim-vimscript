@@ -1,5 +1,8 @@
 Bugs to fix:
 
+- Invalid commands while in visual mode should beep and stay in visual mode.
+- Typing while in insert mode at cursor reaches end of screen, scroll causes cursor to move.
+- Ensure smooth scrolling is turned off.
 - :dig doesn't bring up the window (it flashes a split second).
 - Split text when typing fast after o command.
 - Replace mode - fix caret. Can't figure out how to keep block caret.
@@ -9,5 +12,4 @@ Bugs to fix:
 Requested Functionality to add:
 
 - Show message after shifting lines with :< or :>
-- Visual Column mode
 - / and ? as command operators

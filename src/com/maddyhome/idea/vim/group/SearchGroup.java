@@ -114,8 +114,8 @@ public class SearchGroup extends AbstractActionGroup
     private void setLastPattern(Editor editor, DataContext context, String lastPattern)
     {
         this.lastPattern = lastPattern;
-        CommandGroups.getInstance().getRegister()
-            .storeTextInternal(editor, context, -1, -1, lastPattern, Command.FLAG_MOT_CHARACTERWISE, '/', false, false);
+        CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, new TextRange(-1, -1),
+            lastPattern, Command.FLAG_MOT_CHARACTERWISE, '/', false, false);
     }
 
     public boolean searchAndReplace(Editor editor, DataContext context, LineRange range, String excmd, String exarg)
@@ -1356,35 +1356,35 @@ public class SearchGroup extends AbstractActionGroup
         if (lastSearch != null)
         {
             Element text = new Element("last-search");
-            CDATA data = new CDATA(CDATA.normalizeString(lastSearch));
+            CDATA data = new CDATA(/*CDATA.normalizeString*/(lastSearch));
             text.addContent(data);
             search.addContent(text);
         }
         if (lastOffset != null)
         {
             Element text = new Element("last-offset");
-            CDATA data = new CDATA(CDATA.normalizeString(lastOffset));
+            CDATA data = new CDATA(/*CDATA.normalizeString*/(lastOffset));
             text.addContent(data);
             search.addContent(text);
         }
         if (lastPattern != null)
         {
             Element text = new Element("last-pattern");
-            CDATA data = new CDATA(CDATA.normalizeString(lastPattern));
+            CDATA data = new CDATA(/*CDATA.normalizeString*/(lastPattern));
             text.addContent(data);
             search.addContent(text);
         }
         if (lastReplace != null)
         {
             Element text = new Element("last-replace");
-            CDATA data = new CDATA(CDATA.normalizeString(lastReplace));
+            CDATA data = new CDATA(/*CDATA.normalizeString*/(lastReplace));
             text.addContent(data);
             search.addContent(text);
         }
         if (lastSubstitute != null)
         {
             Element text = new Element("last-substitute");
-            CDATA data = new CDATA(CDATA.normalizeString(lastSubstitute));
+            CDATA data = new CDATA(/*CDATA.normalizeString*/(lastSubstitute));
             text.addContent(data);
             search.addContent(text);
         }
@@ -1419,35 +1419,35 @@ public class SearchGroup extends AbstractActionGroup
             ;
         }
         {
-            lastSearch = search.getChildTextNormalize("last-search");
+            lastSearch = search.getChildText/*Normalize*/("last-search");
         }
         if (search.getChild("last-offset") != null)
         {
             ;
         }
         {
-            lastOffset = search.getChildTextNormalize("last-offset");
+            lastOffset = search.getChildText/*Normalize*/("last-offset");
         }
         if (search.getChild("last-pattern") != null)
         {
             ;
         }
         {
-            lastPattern = search.getChildTextNormalize("last-pattern");
+            lastPattern = search.getChildText/*Normalize*/("last-pattern");
         }
         if (search.getChild("last-replace") != null)
         {
             ;
         }
         {
-            lastReplace = search.getChildTextNormalize("last-replace");
+            lastReplace = search.getChildText/*Normalize*/("last-replace");
         }
         if (search.getChild("last-substitute") != null)
         {
             ;
         }
         {
-            lastSubstitute = search.getChildTextNormalize("last-substitute");
+            lastSubstitute = search.getChildText/*Normalize*/("last-substitute");
         }
 
         Element dir = search.getChild("last-dir");

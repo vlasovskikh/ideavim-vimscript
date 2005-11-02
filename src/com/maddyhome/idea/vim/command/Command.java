@@ -57,6 +57,7 @@ public class Command
     public static final int FLAG_SEARCH_FWD = 1 << 16;
     public static final int FLAG_SEARCH_REV = 1 << 17;
 
+    public static final int FLAG_FORCE_LINEWISE = 1 << 22;
     public static final int FLAG_DELEGATE = 1 << 23;
     /** Special flag used for any mappings involving operators */
     public static final int FLAG_OP_PEND = 1 << 24;

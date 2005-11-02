@@ -41,6 +41,22 @@ public class TextRange
         return getEndOffset() - getStartOffset();
     }
 
+    public int getMaxLength()
+    {
+        int max = 0;
+        for (int i = 0; i < size(); i++)
+        {
+            max = Math.max(max, getEndOffsets()[i] - getStartOffsets()[i]);
+        }
+
+        return max;
+    }
+
+    public int size()
+    {
+        return starts.length;
+    }
+    
     public int getStartOffset()
     {
         return starts[0];
@@ -59,6 +75,36 @@ public class TextRange
     public int[] getEndOffsets()
     {
         return ends;
+    }
+
+    public TextRange normalize()
+    {
+        if (size() == 1 && getEndOffset() < getStartOffset())
+        {
+            int t = starts[0];
+            starts[0] = ends[0];
+            ends[0] = t;
+        }
+
+        return this;
+    }
+
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer();
+        sb.append("TextRange");
+        sb.append("{starts=").append(starts == null ? "null" : "");
+        for (int i = 0; starts != null && i < starts .length; ++i)
+        {
+            sb.append(i == 0 ? "" : ", ").append(starts[i]);
+        }
+        sb.append(", ends=").append(ends == null ? "null" : "");
+        for (int i = 0; ends != null && i < ends .length; ++i)
+        {
+            sb.append(i == 0 ? "" : ", ").append(ends[i]);
+        }
+        sb.append('}');
+        return sb.toString();
     }
 
     private int[] starts;

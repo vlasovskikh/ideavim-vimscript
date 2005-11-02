@@ -33,6 +33,6 @@ public class PutVisualTextHandler extends VisualOperatorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
     {
-        return CommandGroups.getInstance().getCopy().putVisualRange(editor, context, range, cmd.getCount());
+        return CommandGroups.getInstance().getCopy().putVisualRange(editor, context, range, cmd.getCount(), true, false);
     }
 }

@@ -150,6 +150,8 @@ Bug Fixes<br>
         <action id="VimInsertRegister" class="com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction" text="Insert Register"/>
         <action id="VimInsertReplaceToggle" class="com.maddyhome.idea.vim.action.change.insert.InsertInsertAction" text="Toggle Insert/Replace"/>
         <action id="VimInsertSingleCommand" class="com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction" text="Execute Command"/>
+        <action id="VimVisualBlockInsert" class="com.maddyhome.idea.vim.action.change.insert.VisualBlockInsertAction" text="Visual Block Insert"/>
+        <action id="VimVisualBlockAppend" class="com.maddyhome.idea.vim.action.change.insert.VisualBlockAppendAction" text="Visual Block Append"/>
 
         <!-- Delete -->
         <action id="VimDeleteCharacter" class="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction" text="Delete Character"/>
@@ -164,6 +166,7 @@ Bug Fixes<br>
         <action id="VimDeleteMotion" class="com.maddyhome.idea.vim.action.change.delete.DeleteMotionAction" text="Delete Motion"/>
         <action id="VimDeleteVisual" class="com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction" text="Delete Selection"/>
         <action id="VimDeleteVisualLines" class="com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesAction" text="Delete Selected Lines"/>
+        <action id="VimDeleteVisualLinesEnd" class="com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesEndAction" text="Delete Selected Lines"/>
 
         <!-- Change -->
         <action id="VimChangeCaseLowerMotion" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction" text="Change Motion to Lower Case"/>
@@ -182,6 +185,7 @@ Bug Fixes<br>
         <action id="VimChangeVisual" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualAction" text="Change Motion"/>
         <action id="VimChangeVisualCharacter" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction" text="Change Motion"/>
         <action id="VimChangeVisualLines" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction" text="Change Motion"/>
+        <action id="VimChangeVisualLinesEnd" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesEndAction" text="Change Motion"/>
         <action id="VimFilterMotion" class="com.maddyhome.idea.vim.action.change.change.FilterMotionAction" text="Filter Lines"/>
         <action id="VimFilterCountLines" class="com.maddyhome.idea.vim.action.change.change.FilterCountLinesAction" text="Filter Lines"/>
         <action id="VimFilterVisualLines" class="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction" text="Filter Visual Lines"/>
@@ -216,6 +220,8 @@ Bug Fixes<br>
         <action id="VimCopyYankVisual" class="com.maddyhome.idea.vim.action.copy.YankVisualAction" text="Yank Motion"/>
         <action id="VimCopyYankVisualLines" class="com.maddyhome.idea.vim.action.copy.YankVisualLinesAction" text="Yank Motion"/>
         <action id="VimVisualPutText" class="com.maddyhome.idea.vim.action.copy.PutVisualTextAction" text="Paste over Selection"/>
+        <action id="VimVisualPutTextNoIndent" class="com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction" text="Paste over Selection"/>
+        <action id="VimVisualPutTextMoveCursor" class="com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction" text="Paste over Selection"/>
 
         <!-- File -->
         <action id="VimFileSaveClose" class="com.maddyhome.idea.vim.action.file.FileSaveCloseAction" text="Save and Close Editor"/>

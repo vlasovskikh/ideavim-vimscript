@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.handler.CmdFilterHandler;
 import com.maddyhome.idea.vim.ex.handler.CopyTextHandler;
 import com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler;
@@ -247,7 +248,7 @@ public class CommandParser
         handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
         if ((handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0)
         {
-            CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, -1, -1, cmd,
+            CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, new TextRange(-1, -1), cmd,
                 Command.FLAG_MOT_CHARACTERWISE, ':', false, false);
         }
 

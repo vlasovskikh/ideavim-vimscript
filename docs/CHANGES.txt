@@ -1,6 +1,22 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-@VERSION@ from 0.9.7
+@VERSION@ from 0.10.1
+New Features
+- Support of visual blockwise mode using Ctrl-v.
+- Added the visual commands gp, gP, [p, ]p, [P, ]P, I, and A.
+
+Bug Fixes
+- Linewise visual yank now properly inserted linewise during a put.
+- Leading/trailing spaces no longer trimmed from registers when displaying with
+  :reg command.
+- Fix persistence of registers. Whitespace was getting normalized out.
+- Fixed visual mode character change.
+- No longer update "delete" registers when joining lines or shifting text.
+- Undoing a put required two undos instead of one. (Regression from 0.9.7).
+- Fixed various visual put issues.
+- Fixed cursor movements after yank commands.
+
+0.10.1 from 0.9.7
 New Features
 - Eliminated the need for a custom keymap. Enabling/Disabling the plugin via
   the tools menu (or Ctrl-Alt-V) properly configures the required key settings.

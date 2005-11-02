@@ -1442,6 +1442,7 @@ public class MotionGroup extends AbstractActionGroup
                 VisualChange range = EditorData.getLastVisualOperatorRange(editor);
                 if (range == null)
                 {
+                    logger.debug("no prior visual range");
                     return false;
                 }
                 mode = range.getType();
@@ -1665,6 +1666,13 @@ public class MotionGroup extends AbstractActionGroup
 
         LogicalPosition lstart = editor.getSelectionModel().getBlockStart();
         LogicalPosition lend = editor.getSelectionModel().getBlockEnd();
+        if (visualStart > visualEnd)
+        {
+            LogicalPosition t = lend;
+            lend = lstart;
+            lstart = t;
+        }
+
         LogicalPosition nstart = new LogicalPosition(lstart.line, lend.column);
         LogicalPosition nend = new LogicalPosition(lend.line, lstart.column);
 

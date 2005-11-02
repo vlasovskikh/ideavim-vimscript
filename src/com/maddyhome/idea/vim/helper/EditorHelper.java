@@ -27,7 +27,9 @@ import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.common.CharacterPosition;
+import com.maddyhome.idea.vim.common.TextRange;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -486,6 +488,42 @@ public class EditorHelper
         return editor.getDocument().getCharsSequence().subSequence(start, end).toString();
     }
 
+    public static String getText(Editor editor, TextRange range)
+    {
+        int len = range.size();
+        if (len == 1)
+        {
+            return getText(editor, range.getStartOffset(), range.getEndOffset());
+        }
+        else
+        {
+            StringBuffer res = new StringBuffer();
+            int max = range.getMaxLength();
+
+            for (int i = 0; i < len; i++)
+            {
+                if (i > 0)
+                {
+                    res.append('\n');
+                }
+                String line = getText(editor, range.getStartOffsets()[i], range.getEndOffsets()[i]);
+                if (line.length() == 0)
+                {
+                    for (int j = 0; j < max; j++)
+                    {
+                        res.append(' ');
+                    }
+                }
+                else
+                {
+                    res.append(line);
+                }
+            }
+
+            return res.toString();
+        }
+    }
+
     /**
      * Gets the offset of the start of the line containing the supplied offset
      * @param editor The editor
@@ -544,4 +582,26 @@ public class EditorHelper
         int start = getLineStartOffset(editor, lline);
         return CharBuffer.wrap(editor.getDocument().getCharsSequence(), start, start + getLineCharCount(editor, lline));
     }
+
+    public static String pad(Editor editor, int lline, int to)
+    {
+        StringBuffer res = new StringBuffer();
+
+        int len = getLineLength(editor, lline);
+        logger.debug("lline=" + lline);
+        logger.debug("len=" + len);
+        logger.debug("to=" + to);
+        if (len < to)
+        {
+            // TODO - use tabs as needed
+            for (int i = len; i < to; i++)
+            {
+                res.append(' ');
+            }
+        }
+
+        return res.toString();
+    }
+
+    private static final Logger logger = Logger.getInstance(EditorHelper.class.getName());
 }

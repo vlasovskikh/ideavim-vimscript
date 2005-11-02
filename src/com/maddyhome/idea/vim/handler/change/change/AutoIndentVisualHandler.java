@@ -33,7 +33,7 @@ public class AutoIndentVisualHandler extends VisualOperatorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
     {
-        KeyHandler.executeAction("AutoIndentLines", context);
+        KeyHandler.executeAction("OrigAutoIndentLines", context);
 
         return true;
     }

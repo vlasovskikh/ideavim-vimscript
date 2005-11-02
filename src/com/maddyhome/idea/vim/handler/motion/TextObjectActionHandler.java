@@ -53,8 +53,8 @@ public abstract class TextObjectActionHandler extends AbstractEditorActionHandle
             {
                 CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_LINEWISE);
             }
-            else if ((cmd.getFlags() & Command.FLAG_MOT_CHARACTERWISE) != 0 &&
-                CommandState.getInstance().getSubMode() != Command.FLAG_MOT_CHARACTERWISE)
+            else if ((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 &&
+                CommandState.getInstance().getSubMode() == Command.FLAG_MOT_LINEWISE)
             {
                 CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_CHARACTERWISE);
             }

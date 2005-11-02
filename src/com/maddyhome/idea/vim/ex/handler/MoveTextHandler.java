@@ -68,7 +68,8 @@ public class MoveTextHandler extends CommandHandler
         editor.getDocument().deleteString(range.getStartOffset(), range.getEndOffset());
 
         int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
-        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true, false);
+        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true,
+            false, 0);
 
         return true;
     }
