@@ -190,12 +190,12 @@ public class ProcessGroup extends AbstractActionGroup
         KeyHandler.getInstance().reset(editor);
         ExEntryPanel panel = ExEntryPanel.getInstance();
         panel.deactivate(false);
+        final Project project = (Project)context.getData(DataConstants.PROJECT);
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
                 //editor.getContentComponent().requestFocus();
-                FileEditorManager.getInstance((Project)context.getData(DataConstants.PROJECT)).openFile(
-                    EditorData.getVirtualFile(editor), true);
+                FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
             }
         });
 
