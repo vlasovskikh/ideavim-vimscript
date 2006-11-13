@@ -1,6 +1,12 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-@VERSION@ from 0.10.5
+@VERSION@ from 0.10.6
+New Features
+- Implemented Vim help. The :help command can be used to bring up help on any
+  Vim command. The argument to :help must be a specific tag found in the help
+  system. None of the Vim wildcarding is supported.
+
+0.10.6 from 0.10.5
 Bug Fixes
 - Removed the various Code Completion keyboard shortcuts from Vim keymapping.
 - Fixed s command when changing end-of-line (caret was one character off).

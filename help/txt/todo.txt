@@ -1,4 +1,14 @@
-Bugs to fix:
+*todo.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+
+
+                  VIM REFERENCE MANUAL    by Rick Maddy
+
+
+                              TODO list for @NAME@         *todo*
+
+
+                                                        *known-bugs*
+-------------------- Known bugs and current work -----------------------
 
 - Searches are very slow on big files.
 - :dig doesn't bring up the window (it flashes a split second).
@@ -7,9 +17,9 @@ Bugs to fix:
 - Repeating a last change doesn't include text inserted by IDEA using code
   completion.
 
-Requested Functionality to add:
+---------------------  extensions and improvements ----------------------
+                                                    *extensions-improvements*
 
-- Add Config GUI to choose IDEA vs. VIM function for keystrokes
 - Support Select mode
 - Show message after shifting lines with :< or :>
 - / and ? as command operators
@@ -22,9 +32,10 @@ Requested Functionality to add:
 - :write doesn't support a range or arguments
 - Escape not working in :ex
 - Support :global
-- Support no space between ! and command on :! commands
-- !! command not working
-- :! not supported (no range on :!)
 - Support gf
 - Ctrl-w and Ctrl-u in insert mode flaky near end of line or end of file
 - Support Ctrl-A and Ctrl-X (add and substract)
+- Support all the other Vim commands that make sense under IDEA.
+
+vim:tw=78:sw=4:sts=4:ts=8:ft=help:norl:
+vim: set fo+=n :

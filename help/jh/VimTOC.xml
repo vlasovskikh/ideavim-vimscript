@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='ISO-8859-1'  ?>
+<!DOCTYPE toc
+    PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
+    "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+<toc version="1.0">
+    <tocitem text="Vim" target="vim.help.txt" image="vim.logo">
+        <tocitem text="Overview of the most common commands you will use" target="vim.quickref"/>
+        <tocitem text="30 minutes training course for beginners" target="vim.tutor"/>
+        <tocitem text="Vim on the World Wide Web" target="vim.www"/>
+        <tocitem text="Where to send bug reports" target="vim.bugs"/>
+        <tocitem text="Getting Started" target="">
+            <tocitem text="About the manuals" target="vim.usr_01.txt"/>
+            <tocitem text="The first steps in Vim" target="vim.usr_02.txt"/>
+            <tocitem text="Moving around" target="vim.usr_03.txt"/>
+            <tocitem text="Making small changes" target="vim.usr_04.txt"/>
+            <tocitem text="Set your settings" target="vim.usr_05.txt"/>
+            <tocitem text="Using syntax highlighting" target="vim.usr_06.txt"/>
+            <tocitem text="Editing more than one file" target="vim.usr_07.txt"/>
+            <tocitem text="Splitting windows" target="vim.usr_08.txt"/>
+            <tocitem text="Using the GUI" target="vim.usr_09.txt"/>
+            <tocitem text="Making big changes" target="vim.usr_10.txt"/>
+            <tocitem text="Recovering from a crash" target="vim.usr_11.txt"/>
+            <tocitem text="Clever tricks" target="vim.usr_12.txt"/>
+        </tocitem>
+        <tocitem text="Editing Effectively" target="">
+            <tocitem text="Typing command-line commands quickly" target="vim.usr_20.txt"/>
+            <tocitem text="Go away and come back" target="vim.usr_21.txt"/>
+            <tocitem text="Finding the file to edit" target="vim.usr_22.txt"/>
+            <tocitem text="Editing other files" target="vim.usr_23.txt"/>
+            <tocitem text="Inserting quickly" target="vim.usr_24.txt"/>
+            <tocitem text="Editing formatted text" target="vim.usr_25.txt"/>
+            <tocitem text="Repeating" target="vim.usr_26.txt"/>
+            <tocitem text="Search commands and patterns" target="vim.usr_27.txt"/>
+            <tocitem text="Folding" target="vim.usr_28.txt"/>
+            <tocitem text="Moving through programs" target="vim.usr_29.txt"/>
+            <tocitem text="Editing programs" target="vim.usr_30.txt"/>
+            <tocitem text="Exploiting the GUI" target="vim.usr_31.txt"/>
+        </tocitem>
+        <tocitem text="General subjects" target="">
+            <tocitem text="General introduction to Vim; notation used in help files" target="vim.intro.txt"/>
+            <tocitem text="Overview and quick reference (this file)" target="vim.help.txt"/>
+            <tocitem text="Alphabetical index of all commands" target="vim.index.txt"/>
+            <tocitem text="How to do the most common editing tasks" target="vim.howto.txt"/>
+            <tocitem text="Various tips on using Vim" target="vim.tips.txt"/>
+            <tocitem text="(error) messages and explanations" target="vim.message.txt"/>
+            <tocitem text="Known problems and desired extensions" target="vim.todo.txt"/>
+        </tocitem>
+
+        <tocitem text="Basic Editing" target="">
+            <tocitem text="Starting Vim, Vim command arguments, initialisation" target="vim.starting.txt"/>
+            <tocitem text="Editing and writing files" target="vim.editing.txt"/>
+            <tocitem text="Commands for moving around" target="vim.motion.txt"/>
+            <tocitem text="Scrolling the text in the window" target="vim.scroll.txt"/>
+            <tocitem text="Insert and Replace mode" target="vim.insert.txt"/>
+            <tocitem text="Deleting and replacing text" target="vim.change.txt"/>
+            <tocitem text="Automatic indenting for C and other languages" target="vim.indent.txt"/>
+            <tocitem text="Undo and Redo" target="vim.undo.txt"/>
+            <tocitem text="Repeating commands, Vim scripts and debugging" target="vim.repeat.txt"/>
+            <tocitem text="Using the Visual mode (selecting a text area)" target="vim.visual.txt"/>
+            <tocitem text="Various remaining commands" target="vim.various.txt"/>
+            <tocitem text="Recovering from a crash" target="vim.recover.txt"/>
+        </tocitem>
+
+        <tocitem text="Advanced Editing" target="">
+            <tocitem text="Command-line editing" target="vim.cmdline.txt"/>
+            <tocitem text="Description of all options" target="vim.options.txt"/>
+            <tocitem text="Regexp patterns and search commands" target="vim.pattern.txt"/>
+            <tocitem text="Key mapping and abbreviations" target="vim.map.txt"/>
+            <tocitem text="Tags and special searches" target="vim.tagsrch.txt"/>
+            <tocitem text="Commands for a quick edit-compile-fix cycle" target="vim.quickfix.txt"/>
+            <tocitem text="Commands for using multiple windows and buffers" target="vim.windows.txt"/>
+            <tocitem text="Syntax highlighting" target="vim.syntax.txt"/>
+            <tocitem text="Working with two or three versions of the same file" target="vim.diff.txt"/>
+            <tocitem text="Automatically executing commands on an event" target="vim.autocmd.txt"/>
+            <tocitem text="Settings done specifically for a type of file" target="vim.filetype.txt"/>
+            <tocitem text="Expression evaluation, conditional commands" target="vim.eval.txt"/>
+            <tocitem text="Hide (fold) ranges of lines" target="vim.fold.txt"/>
+        </tocitem>
+
+        <tocitem text="Special Issues" target="">
+            <tocitem text="List of available digraphs" target="vim.digraph.txt"/>
+        </tocitem>
+
+        <tocitem text="Versions" target="">
+            <tocitem text="Main differences between Vim and Vi" target="vim.vi_diff.txt"/>
+        </tocitem>
+    </tocitem>
+</toc>

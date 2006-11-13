@@ -19,9 +19,7 @@ Bug Fixes<br>
 ]]>
     </change-notes>
 
-<!--
     <helpset file="help.jar" path="/VimHelp.hs"/>
--->
 
     <idea-version since-build="@SINCE-VERSION@"/>
 
@@ -35,7 +33,7 @@ Bug Fixes<br>
     </project-components>
 
     <actions>
-        <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPlugin$VimPluginToggleAction" text="VIM Emulator" description="Toggle the Vim Plugin On/Off">
+        <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPlugin.VimPluginToggleAction" text="VIM Emulator" description="Toggle the Vim Plugin On/Off">
             <keyboard-shortcut first-keystroke="control alt V" keymap="$default"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>

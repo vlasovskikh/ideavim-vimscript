@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.KeyHandler;
+import com.intellij.openapi.help.HelpManager;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -33,12 +33,20 @@ public class HelpHandler extends CommandHandler
 {
     public HelpHandler()
     {
-        super("h", "elp", 0);
+        super("h", "elp", ARGUMENT_OPTIONAL);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
     {
-        KeyHandler.executeAction("HelpTopics", context);
+        //KeyHandler.executeAction("HelpTopics", context);
+        String key = cmd.getArgument();
+        if (key.length() == 0)
+        {
+            key = "help.txt";
+        }
+
+        HelpManager mgr = HelpManager.getInstance();
+        mgr.invokeHelp("vim." + key);
 
         return true;
     }
