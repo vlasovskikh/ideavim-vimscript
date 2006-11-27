@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.ui;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -82,6 +82,7 @@ public class ExEditorKit extends DefaultEditorKit
         return new ExDocument();
     }
 
+    public static final String EscapeChar = "escape";
     public static final String DeletePreviousChar = "delete-prev-char";
     public static final String DeletePreviousWord = "delete-prev-word";
     public static final String DeleteToCursor = "delete-to-cursor";
@@ -96,6 +97,7 @@ public class ExEditorKit extends DefaultEditorKit
 
     //TODO - add rest of actions
     protected Action[] exActions = new Action[] {
+        new EscapeCharAction(),
         new DeletePreviousCharAction(),
         new DeletePreviousWordAction(),
         new DeleteToCursorAction(),
@@ -121,6 +123,21 @@ public class ExEditorKit extends DefaultEditorKit
             }
         }
 
+    }
+
+    public static class EscapeCharAction extends TextAction
+    {
+        public EscapeCharAction()
+        {
+            super(EscapeChar);
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            CommandGroups.getInstance().getProcess().cancelExEntry(
+                ExEntryPanel.getInstance().getEntry().getEditor(),
+                ExEntryPanel.getInstance().getEntry().getContext());
+        }
     }
 
     public static class DeletePreviousCharAction extends TextAction

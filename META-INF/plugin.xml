@@ -235,7 +235,8 @@ Enhancements<br>
         <action id="VimFileSaveClose" class="com.maddyhome.idea.vim.action.file.FileSaveCloseAction" text="Save and Close Editor"/>
 
         <!-- Search -->
-        <action id="VimSearchEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryAction" text="Search"/>
+        <action id="VimSearchFwdEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" text="Search Forward"/>
+        <action id="VimSearchRevEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction" text="Search Backward"/>
         <action id="VimSearchAgainNext" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction" text="Search Again"/>
         <action id="VimSearchAgainPrevious" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction" text="Search Again"/>
         <action id="VimSearchWholeWordForward" class="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction" text="Search Again"/>

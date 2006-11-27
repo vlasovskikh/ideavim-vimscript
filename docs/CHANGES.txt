@@ -1,6 +1,10 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-@VERSION@ from 0.10.6
+@VERSION@ from 0.11.1
+New Features
+- / and ? can now be used as motion operators after such commands as d and c.
+
+0.11.1 from 0.10.6
 New Features
 - Implemented Vim help. The :help command can be used to bring up help on any
   Vim command. The argument to :help must be a specific tag found in the help

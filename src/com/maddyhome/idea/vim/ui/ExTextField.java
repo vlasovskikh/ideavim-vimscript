@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.ui;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -95,18 +95,23 @@ public class ExTextField extends JTextField
                 keep = true;
                 break;
             case KeyEvent.KEY_PRESSED:
-                if (e.getKeyChar() == KeyEvent.VK_UNDEFINED)
+                logger.debug("pressed");
+                if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED)
                 {
+                    logger.debug("keeping");
                     keep = true;
                 }
                 break;
             case KeyEvent.KEY_RELEASED:
-                if (e.getKeyChar() != KeyEvent.VK_UNDEFINED)
+                logger.debug("released");
+                if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
                 {
                     if (e.getModifiers() != 0)
                     {
+                        logger.debug("keeping");
                         keep = true;
                     }
+                    /*
                     else
                     {
                         switch(e.getKeyCode())
@@ -116,6 +121,7 @@ public class ExTextField extends JTextField
                                 e.consume();
                         }
                     }
+                    */
                 }
                 break;
         }

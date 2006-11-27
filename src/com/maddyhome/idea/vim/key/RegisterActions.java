@@ -614,10 +614,10 @@ public class RegisterActions
             new Shortcut('}'));
 
         // Misc Actions
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchEntry", Command.OTHER_READONLY, Command.FLAG_SEARCH_FWD | Command.FLAG_SAVE_JUMP,
-            new Shortcut('/'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchEntry", Command.OTHER_READONLY, Command.FLAG_SEARCH_REV | Command.FLAG_SAVE_JUMP,
-            new Shortcut('?'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchFwdEntry", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SEARCH_FWD | Command.FLAG_SAVE_JUMP,
+            new Shortcut('/'), Argument.EX_STRING);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchRevEntry", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SEARCH_REV | Command.FLAG_SAVE_JUMP,
+            new Shortcut('?'), Argument.EX_STRING);
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchAgainNext", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SAVE_JUMP,
             new Shortcut('n'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchAgainPrevious", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SAVE_JUMP,
@@ -634,7 +634,7 @@ public class RegisterActions
             new Shortcut("g#"));
 
         // ********************** Command Line Actions ************************
-        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExEntry", Command.OTHER_READ_WRITE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExEntry", Command.OTHER_READ_WRITE, Command.FLAG_COMPLETE_EX, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),

@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.action.motion.search;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,16 +19,16 @@ package com.maddyhome.idea.vim.action.motion.search;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.handler.motion.search.SearchEntryHandler;
+import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
+import com.maddyhome.idea.vim.handler.motion.search.SearchEntryFwdHandler;
 
 /**
  *
  */
-public class SearchEntryAction extends EditorAction
+public class SearchEntryFwdAction extends MotionEditorAction
 {
-    public SearchEntryAction()
+    public SearchEntryFwdAction()
     {
-        super(new SearchEntryHandler());
+        super(new SearchEntryFwdHandler());
     }
 }

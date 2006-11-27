@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -66,23 +66,30 @@ public class ProcessGroup extends AbstractActionGroup
         return lastCommand;
     }
 
-    public void startSearchCommand(Editor editor, DataContext context, Command cmd)
+    public void startSearchCommand(Editor editor, DataContext context, int count, char leader)
     {
         String initText = "";
-        int flags = cmd.getFlags();
-        String label = "";
-        if ((flags & Command.FLAG_SEARCH_FWD) != 0)
-        {
-            label = "/";
-        }
-        else if ((flags & Command.FLAG_SEARCH_REV) != 0)
-        {
-            label = "?";
-        }
+        String label = "" + leader;
 
-        CommandState.getInstance(editor).pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+        //CommandState.getInstance(editor).pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
         ExEntryPanel panel = ExEntryPanel.getInstance();
-        panel.activate(editor, context, label, initText, cmd.getCount());
+        panel.activate(editor, context, label, initText, count);
+    }
+
+    public String endSearchCommand(final Editor editor, DataContext context)
+    {
+        ExEntryPanel panel = ExEntryPanel.getInstance();
+        panel.deactivate(false);
+
+        final Project project = (Project)context.getData(DataConstants.PROJECT);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+                FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
+            }
+        });
+
+        return panel.getText();
     }
 
     public void startExCommand(Editor editor, DataContext context, Command cmd)
@@ -155,6 +162,7 @@ public class ProcessGroup extends AbstractActionGroup
         finally
         {
             final int flg = flags;
+            final Project project = (Project)context.getData(DataConstants.PROJECT);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run()
                 {
@@ -163,14 +171,13 @@ public class ProcessGroup extends AbstractActionGroup
                     // version 1050.
                     if ((flg & CommandParser.RES_DONT_REOPEN) == 0)
                     {
-                        FileEditorManager.getInstance((Project)context.getData(DataConstants.PROJECT)).openFile(
-                            EditorData.getVirtualFile(editor), true);
+                        FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
                     }
 
                     // If the result of the ex command is to display the "more" panel, show it here.
                     if ((flg & CommandParser.RES_MORE_PANEL) != 0)
                     {
-                        RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
+                        RunnableHelper.runReadCommand(project, new Runnable() {
                             public void run()
                             {
                                 MorePanel.getInstance(editor).setVisible(true);

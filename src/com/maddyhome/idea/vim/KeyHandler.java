@@ -162,6 +162,7 @@ public class KeyHandler
             // First let's check to see if we are at the point of expecting a single character argument to a command.
             else if (currentArg == Argument.CHARACTER)
             {
+                logger.debug("currentArg is Character");
                 // We are expecting a character argument - is this a regular character the user typed?
                 // Some special keys can be handled as character arguments - let's check for them here.
                 if (chKey == 0)
@@ -234,21 +235,29 @@ public class KeyHandler
                 // If this is a branch node we have entered only part of a multikey command
                 if (node instanceof BranchNode)
                 {
+                    logger.debug("branch node");
                     // Flag that we aren't allowing any more count digits
                     mode = STATE_COMMAND;
                     editorState.setCurrentNode((BranchNode)node);
-                    if (editorState.isRecording())
+
+                    ArgumentNode arg = (ArgumentNode)((BranchNode)editorState.getCurrentNode()).getArgumentNode();
+                    if (arg != null)
                     {
-                        ArgumentNode arg = (ArgumentNode)((BranchNode)editorState.getCurrentNode()).getArgumentNode();
-                        if (arg != null && (arg.getFlags() & Command.FLAG_NO_ARG_RECORDING) != 0)
+                        if (editorState.isRecording() && (arg.getFlags() & Command.FLAG_NO_ARG_RECORDING) != 0)
                         {
                             handleKey(editor, KeyStroke.getKeyStroke(' '), context);
                         }
+
+                        if (arg.getArgType() == Argument.EX_STRING)
+                        {
+                            CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, chKey);
+                        }
                     }
                 }
-                // If this is a command node the user has entered a valid key sequence of a know command
+                // If this is a command node the user has entered a valid key sequence of a known command
                 else if (node instanceof CommandNode)
                 {
+                    logger.debug("command node");
                     // If all does well we are ready to process this command
                     mode = STATE_READY;
                     CommandNode cmdNode = (CommandNode)node;
@@ -278,6 +287,14 @@ public class KeyHandler
                             mode = STATE_BAD_COMMAND;
                         }
                     }
+                    else if (currentArg == Argument.EX_STRING && (cmdNode.getFlags() & Command.FLAG_COMPLETE_EX) != 0)
+                    {
+                        String text = CommandGroups.getInstance().getProcess().endSearchCommand(editor, context);
+                        Argument arg = new Argument(text);
+                        Command cmd = (Command)currentCmd.peek();
+                        cmd.setArgument(arg);
+                        CommandState.getInstance(editor).popState();
+                    }
                     // The user entered a valid command that doesn't take any arguments
                     else
                     {
@@ -300,6 +317,7 @@ public class KeyHandler
                 // be the first keystroke of the current command's argument
                 else if (node instanceof ArgumentNode)
                 {
+                    logger.debug("argument node");
                     // Create a new command based on what the user has typed so far, excluding this keystroke.
                     ArgumentNode arg = (ArgumentNode)node;
                     Command cmd = new Command(count, arg.getActionId(), arg.getAction(), arg.getCmdType(), arg.getFlags());
@@ -324,6 +342,11 @@ public class KeyHandler
                                 editorState.pushState(editorState.getMode(), editorState.getSubMode(),
                                     KeyParser.MAPPING_OP_PEND);
                             }
+                            break;
+                        case Argument.EX_STRING:
+                            mode = STATE_NEW_COMMAND;
+                            currentArg = arg.getArgType();
+                            editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
                             break;
                         default:
                             // Oops - we aren't expecting any other type of argument
