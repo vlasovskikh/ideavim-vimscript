@@ -9,11 +9,11 @@ Bugs to fix:
 
 Requested Functionality to add:
 
+- Support command line history/editing
 - Add Config GUI to choose IDEA vs. VIM function for keystrokes
 - Support Select mode
 - Show message after shifting lines with :< or :>
 - Backspace in Replace mode deletes instead of restoring
-- Support command line history/editing
 - Support incsearch option
 - Support CTRL-O, CTRL-I, :jumps
 - Support U (line undo)

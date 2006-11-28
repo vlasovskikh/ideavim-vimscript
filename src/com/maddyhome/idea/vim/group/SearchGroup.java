@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -113,6 +113,8 @@ public class SearchGroup extends AbstractActionGroup
         this.lastPattern = lastPattern;
         CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, new TextRange(-1, -1),
             lastPattern, Command.FLAG_MOT_CHARACTERWISE, '/', false, false);
+
+        CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
     }
 
     public boolean searchAndReplace(Editor editor, DataContext context, LineRange range, String excmd, String exarg)

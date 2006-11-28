@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.ex;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -192,7 +192,7 @@ public abstract class CommandHandler
      * @param count The count entered by the user prior to the command
      * @throws ExException if the range or argument is invalid or unable to run the command
      */
-    public void process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
+    public boolean process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
         ExException
     {
         // No range allowed
@@ -222,12 +222,12 @@ public abstract class CommandHandler
 
         CommandState.getInstance(editor).setFlags(optFlags);
 
+        boolean res = true;
         if ((argFlags & WRITABLE) != 0)
         {
             //RunnableHelper.runWriteCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
             //    public void run()
             //    {
-                    boolean res = true;
                     try
                     {
                         UndoManager.getInstance().endCommand(editor);
@@ -263,7 +263,6 @@ public abstract class CommandHandler
             //RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
             //    public void run()
             //    {
-                    boolean res = true;
                     try
                     {
                         for (int i = 0; i < count; i++)
@@ -284,6 +283,8 @@ public abstract class CommandHandler
             //    }
             //});
         }
+
+        return res;
     }
 
     /**

@@ -1,4 +1,4 @@
-*todo.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*todo.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 27
 
 
                   VIM REFERENCE MANUAL    by Rick Maddy
@@ -22,7 +22,6 @@
 
 - Support Select mode
 - Show message after shifting lines with :< or :>
-- / and ? as command operators
 - Backspace in Replace mode deletes instead of restoring
 - Support command line history/editing
 - Support incsearch option

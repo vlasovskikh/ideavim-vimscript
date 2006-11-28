@@ -3,7 +3,7 @@ package com.maddyhome.idea.vim.ex;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -69,8 +69,10 @@ import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.HistoryHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -127,6 +129,7 @@ public class CommandParser
         new GotoCharacterHandler();
         //new GotoLineHandler(); - not needed here
         new HelpHandler();
+        new HistoryHandler();
         new JoinLinesHandler();
         new MarkHandler();
         new MarksHandler();
@@ -203,6 +206,9 @@ public class CommandParser
             return result | RES_EMPTY;
         }
 
+        // Save the command history
+        CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+
         // Parse the command
         ParseResult res = parse(cmd);
         String command = res.getCommand();
@@ -245,14 +251,14 @@ public class CommandParser
         }
 
         // Run the command
-        handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
-        if ((handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0)
+        boolean ok = handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
+        if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0)
         {
             CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, new TextRange(-1, -1), cmd,
                 Command.FLAG_MOT_CHARACTERWISE, ':', false, false);
         }
 
-        if ((handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0)
+        if (ok && (handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0)
         {
             result |= RES_MORE_PANEL;
         }

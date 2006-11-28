@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.option;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -547,6 +547,7 @@ public class Options
     {
         addOption(new ToggleOption("digraph", "dg", false));
         addOption(new ToggleOption("gdefault", "gd", false));
+        addOption(new NumberOption("history", "hi", 20, 1, Integer.MAX_VALUE));
         if (ApiHelper.supportsColorSchemes())
         {
             addOption(new ToggleOption("hlsearch", "hls", false));

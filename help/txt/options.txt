@@ -1,4 +1,4 @@
-*options.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*options.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 27
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -3048,16 +3048,18 @@ A jump table for the options with a short description can be found at |Q_op|.
         line below a closed fold.  A match in a previous line which is not
         drawn may not continue in an newly drawn line.
 
-<!--
                                                 *'history'* *'hi'*
-'history' 'hi'          number  (Vim default: 20, Vi default: 0)
+'history' 'hi'          number  (default: 20)
                         global
 
         A history of ":" commands, and a history of previous search patterns
         are remembered.  This option decides how many entries may be stored in
         each of these histories (see |cmdline-editing|).
+<!--
         NOTE: This option is set to the Vi default value when 'compatible' is
         set and to the Vim default value when 'compatible' is reset.
+-->
+<!--
 
                                          *'hkmap'* *'hk'* *'nohkmap'* *'nohk'*
 'hkmap' 'hk'            boolean (default off)

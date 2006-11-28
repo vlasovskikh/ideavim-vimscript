@@ -3,6 +3,8 @@ History of changes for @NAME@ for IDEA @IDEA-VERSION@
 @VERSION@ from 0.11.1
 New Features
 - / and ? can now be used as motion operators after such commands as d and c.
+- Added support for history option.
+- Added support for :history command.
 
 0.11.1 from 0.10.6
 New Features

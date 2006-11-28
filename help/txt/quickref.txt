@@ -1,4 +1,4 @@
-*quickref.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*quickref.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 27
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -756,8 +756,8 @@ Short explanation of each option:               *option-list*
 |'highlight'|     |'hl'|     sets highlighting mode for various occasions
 -->
 |'hlsearch'|      |'hls'|    highlight matches with last search pattern
-<!--
 |'history'|       |'hi'|     number of command-lines that are remembered
+<!--
 |'hkmap'|         |'hk'|     Hebrew keyboard mapping
 |'hkmapp'|        |'hkp'|    phonetic Hebrew keyboard mapping
 |'icon'|                     let Vim set the text of the window icon
@@ -1052,7 +1052,9 @@ Short explanation of each option:               *option-list*
 |c_<Up>|        <Up>/<Down>        recall older/newer command-line that starts
                                       with current command
 |c_<S-Up>|      <S-Up>/<S-Down>    recall older/newer command-line from history
+-->
 |:history|      :his[tory]         show older command-lines
+<!--
 
 Context-sensitive completion on the command-line:
 
