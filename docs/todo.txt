@@ -9,7 +9,6 @@ Bugs to fix:
 
 Requested Functionality to add:
 
-- Support command line history/editing
 - Add Config GUI to choose IDEA vs. VIM function for keystrokes
 - Support Select mode
 - Show message after shifting lines with :< or :>

@@ -1,4 +1,4 @@
-*cmdline.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*cmdline.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Dec 01
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -23,12 +23,11 @@ Basic command line editing is explained in chapter 20 of the user manual
 ==============================================================================
 1. Command-line editing                                 *cmdline-editing*
 
-<!--
 Normally characters are inserted in front of the cursor position.  You can
 move around in the command-line with the left and right cursor keys.  With the
 <Insert> key, you can toggle between inserting and overstriking characters.
-{Vi: can only alter the last character in the line}
 
+<!--
 Note that if your keyboard does not have working cursor keys or any of the
 other special keys, you can use ":cnoremap" to define another key for them.
 For example, to define tcsh style editing keys:         *tcsh-style*  >
@@ -38,6 +37,7 @@ For example, to define tcsh style editing keys:         *tcsh-style*  >
         :cnoremap <Esc>b <S-Left>
         :cnoremap <Esc>f <S-Right>
 (<> notation |<>|; type all this literally)
+-->
 
                                                         *cmdline-too-long*
 When the command line is getting longer than what fits on the screen, only the
@@ -65,8 +65,6 @@ Notes:
 - All searches are put in the search history, including the ones that come
   from commands like "*" and "#".  But for a mapping, only the last search is
   remembered (to avoid that long mappings trash the history).
-{Vi: no history}
-{not available when compiled without the |+cmdline_hist| feature}
 
 There is an automatic completion of names on the command-line; see
 |cmdline-completion|.
@@ -111,21 +109,21 @@ CTRL-H                                                  *c_<BS>* *c_CTRL-H*
 CTRL-W          delete the word before the cursor
                                                         *c_CTRL-U*
 CTRL-U          remove all characters between the cursor position and
-                the beginning of the line.  Previous versions of vim
-                deleted all characters on the line.  If that is the
-                preferred behavior, add the following to your .vimrc: >
-                        :cnoremap <C-U> <C-E><C-U>
-<
+                the beginning of the line.
                 Note: if the command-line becomes empty with one of the
                 delete commands, Command-line mode is quit.
                                                         *c_<Insert>*
 <Insert>        Toggle between insert and overstrike.
 
-{char1} <BS> {char2}    or                              *c_digraph*
+                                                        *c_digraph*
 CTRL-K {char1} {char2}                                  *c_CTRL-K*
-                enter digraph (see |digraphs|).  When {char1} is a special
+                enter digraph (see |digraphs|).
+<!--
+                  When {char1} is a special
                 key, the code for that key is inserted in <> form.
+-->
 
+<!--
 CTRL-R {0-9a-z"%#:-=.}                                  *c_CTRL-R* *c_<C-R>*
                 Insert the contents of a numbered or named register.  Between
                 typing CTRL-R and the second character '"' will be displayed
@@ -179,6 +177,7 @@ CTRL-R CTRL-O {0-9a-z"%#:-=. CTRL-F CTRL-P CTRL-W CTRL-A}
 CTRL-Y          When there is a modeless selection, copy the selection into
                 the clipboard. |modeless-selection|
                 If there is no selection CTRL-Y is inserted as a character.
+-->
 
 CTRL-J                                          *c_CTRL-J* *c_<NL>* *c_<CR>*
 <CR> or <NL>    start entered command
@@ -192,25 +191,18 @@ CTRL-C          quit command-line without executing
                                                         *c_<Up>*
 <Up>            recall older command-line from history, whose beginning
                 matches the current command-line (see below).
-                {not available when compiled without the |+cmdline_hist|
-                feature}
                                                         *c_<Down>*
 <Down>          recall more recent command-line from history, whose beginning
                 matches the current command-line (see below).
-                {not available when compiled without the |+cmdline_hist|
-                feature}
 
                                                         *c_<S-Up>* *c_<PageUp>*
 <S-Up> or <PageUp>
                 recall older command-line from history
-                {not available when compiled without the |+cmdline_hist|
-                feature}
                                                 *c_<S-Down>* *c_<PageDown>*
 <S-Down> or <PageDown>
                 recall more recent command-line from history
-                {not available when compiled without the |+cmdline_hist|
-                feature}
 
+<!--
 CTRL-D          command-line completion (see |cmdline-completion|)
 'wildchar' option
                 command-line completion (see |cmdline-completion|)
@@ -261,6 +253,7 @@ CTRL-^          Toggle the use of language |:lmap| mappings and/or Input
                 for the next command or Search pattern.
 
 For Emacs-style editing on the command-line see |emacs-keys|.
+-->
 
 The <Up> and <Down> keys take the current command-line as a search string.
 The beginning of the next/previous command-lines are compared with this
@@ -299,11 +292,11 @@ terminals)
 <
                 List the recent five entries from all histories: >
                         :history all -5,
--->
 
 ==============================================================================
 2. Command-line completion                              *cmdline-completion*
 
+Not currently supported by @NAME@
 <!--
 When editing the command-line, a few commands can be used to complete the
 word before the cursor.  This is available for:
@@ -408,9 +401,9 @@ And this in your .vimrc: >
 ==============================================================================
 3. Ex command-lines                                     *cmdline-lines*
 
+<!--
 The Ex commands have a few specialties:
 
-<!--
                                                         *:quote*
 '"' at the start of a line causes the whole line to be ignored.  '"'
 after a command causes the rest of the line to be ignored.  This can be used
@@ -523,6 +516,7 @@ argument for the command, which has a different meaning.  For example:
                         any existing file
         :w !name        send the current buffer as standard input to command
                         "name"
+-->
 
 ==============================================================================
 4. Ex command-line ranges       *cmdline-ranges* *[range]* *E16* *E493*

@@ -641,6 +641,7 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke((char)0x0a)),
             new Shortcut(KeyStroke.getKeyStroke((char)0x0d))
         });
+        /*
         parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimCancelExEntry", Command.OTHER_READONLY, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK)),
@@ -670,6 +671,7 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
             new Shortcut(KeyStroke.getKeyStroke((char)0x7f))
         });
+        */
 
         // ********************** Various Mode Actions ************************
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimCommentByLineComment", Command.CHANGE, Command.FLAG_MOT_LINEWISE | Command.FLAG_KEEP_VISUAL);

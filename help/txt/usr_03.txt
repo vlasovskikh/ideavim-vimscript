@@ -380,7 +380,6 @@ case again: >
         :set noignorecase
 
 
-<!--
 HISTORY
 
 Suppose you do three searches: >
@@ -405,7 +404,6 @@ The commands starting with ":" also have a history.  That allows you to recall
 a previous command and execute it again.  These two histories are separate.
 
 
--->
 SEARCHING FOR A WORD IN THE TEXT
 
 Suppose you see the word "TheLongFunctionName" in the text and you want to

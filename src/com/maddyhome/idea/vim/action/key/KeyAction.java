@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.action.key;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
 
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
@@ -44,12 +45,20 @@ public class KeyAction extends AnAction
 
         if (event.getInputEvent() instanceof KeyEvent)
         {
+            KeyEvent ke = (KeyEvent)event.getInputEvent();
+            Editor editor = (Editor)event.getDataContext().getData(DataConstants.EDITOR);
+            if (editor != null)
             {
-                KeyStroke key = KeyStroke.getKeyStrokeForEvent((KeyEvent)event.getInputEvent());
-                Editor editor = (Editor)event.getDataContext().getData(DataConstants.EDITOR);
-                if (editor != null)
+                KeyStroke key = KeyStroke.getKeyStrokeForEvent(ke);
+                KeyHandler.getInstance().handleKey(editor, key, event.getDataContext());
+            }
+            else
+            {
+                if (ExEntryPanel.getInstance().isActive())
                 {
-                    KeyHandler.getInstance().handleKey(editor, key, event.getDataContext());
+                    KeyEvent e = new KeyEvent(ke.getComponent(), ke.getID(), ke.getWhen(), ke.getModifiers(),
+                        ke.getKeyCode(), ke.getKeyChar(), ke.getKeyLocation());
+                    ExEntryPanel.getInstance().processKey(e);
                 }
             }
         }

@@ -543,8 +543,8 @@ not recognize a comment (starting with '"') after the ":!" command.
                         is omitted start in the current line.
 <!--
                         Also see |cmdline-ranges|.
-                        See |:s_flags| for the flags.
 -->
+                        See |:s_flags| for the flags.
 
 :[range]s[ubstitute] [c][e][g][p][r][i][I] [count]
 :[range]&[&][c][e][g][p][r][i][I] [count]                       *:&*

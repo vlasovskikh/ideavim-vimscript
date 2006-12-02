@@ -251,6 +251,9 @@ public class KeyHandler
                         if (arg.getArgType() == Argument.EX_STRING)
                         {
                             CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, chKey);
+                            mode = STATE_NEW_COMMAND;
+                            currentArg = Argument.EX_STRING;
+                            editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
                         }
                     }
                 }
@@ -344,9 +347,11 @@ public class KeyHandler
                             }
                             break;
                         case Argument.EX_STRING:
+                            /*
                             mode = STATE_NEW_COMMAND;
                             currentArg = arg.getArgType();
                             editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+                            */
                             break;
                         default:
                             // Oops - we aren't expecting any other type of argument

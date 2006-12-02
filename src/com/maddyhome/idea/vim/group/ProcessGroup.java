@@ -39,7 +39,6 @@ import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.MorePanel;
 
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -89,6 +88,7 @@ public class ProcessGroup extends AbstractActionGroup
             }
         });
 
+        record(editor, panel.getText());
         return panel.getText();
     }
 
@@ -102,6 +102,25 @@ public class ProcessGroup extends AbstractActionGroup
 
     public boolean processExKey(Editor editor, DataContext context, KeyStroke stroke, boolean charOnly)
     {
+        // This will only get called if somehow the key focus ended up in the editor while the ex entry window
+        // is open. So I'll put focus back in the editor and process the key.
+
+        ExEntryPanel panel = ExEntryPanel.getInstance();
+        if (panel.isActive())
+        {
+            panel.requestFocus();
+            panel.handleKey(stroke);
+
+            return true;
+        }
+        else
+        {
+            CommandState.getInstance(editor).popState();
+            KeyHandler.getInstance().reset(editor);
+            return false;
+        }
+
+        /*
         if (!charOnly || stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED && ExEntryPanel.getInstance().isActive())
         {
             ExEntryPanel panel = ExEntryPanel.getInstance();
@@ -113,6 +132,7 @@ public class ProcessGroup extends AbstractActionGroup
         {
             return false;
         }
+        */
     }
 
     public boolean processExEntry(final Editor editor, final DataContext context)
@@ -126,6 +146,7 @@ public class ProcessGroup extends AbstractActionGroup
             CommandState.getInstance(editor).popState();
             logger.debug("processing command");
             final String text = panel.getText();
+            record(editor, text);
             logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
             if (panel.getLabel().equals(":"))
             {
@@ -207,6 +228,14 @@ public class ProcessGroup extends AbstractActionGroup
         });
 
         return true;
+    }
+
+    private void record(Editor editor, String text)
+    {
+        if (CommandState.getInstance(editor).isRecording())
+        {
+            CommandGroups.getInstance().getRegister().addText(text);
+        }
     }
 
     public void startFilterCommand(Editor editor, DataContext context, Command cmd)

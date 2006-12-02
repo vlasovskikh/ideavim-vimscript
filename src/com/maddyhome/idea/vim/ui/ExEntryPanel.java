@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.ui;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2005 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -33,6 +33,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -44,7 +45,6 @@ import javax.swing.SwingUtilities;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
- * TODO - support complete set of command line editing keys
  * TODO - redo focus change support to work like MorePanel
  */
 public class ExEntryPanel extends JPanel
@@ -117,6 +117,7 @@ public class ExEntryPanel extends JPanel
         this.count = count;
         entry.setDocument(entry.createDefaultModel());
         entry.setText(initText);
+        entry.setType(label);
         parent = comp;
         root = SwingUtilities.getRootPane(parent);
         oldGlass = root.getGlassPane();
@@ -154,6 +155,11 @@ public class ExEntryPanel extends JPanel
     public void handleKey(KeyStroke stroke)
     {
         entry.handleKey(stroke);
+    }
+
+    public void processKey(KeyEvent event)
+    {
+        entry.processKeyEvent(event);
     }
 
     private void positionPanel()

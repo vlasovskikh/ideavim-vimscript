@@ -118,12 +118,14 @@ This tells Vim to keep a backup copy of a file when overwriting it.  But not
 on the VMS system, since it keeps old versions of files already.  The backup
 file will have the same name as the original file with "~" added.  See |07.4|
 >
+-->
 
         set history=50
 
 Keep 50 commands and 50 search patterns in the history.  Use another number if
 you want to remember fewer or more lines.
 >
+<!--
 
         set ruler
 

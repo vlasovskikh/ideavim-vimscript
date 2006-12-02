@@ -23,7 +23,6 @@
 - Support Select mode
 - Show message after shifting lines with :< or :>
 - Backspace in Replace mode deletes instead of restoring
-- Support command line history/editing
 - Support incsearch option
 - Support CTRL-O, CTRL-I, :jumps
 - Support U (line undo)

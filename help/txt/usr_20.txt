@@ -47,7 +47,6 @@ The most often used keys to move around in the command line:
 
         <Left>                  one character left
         <Right>                 one character right
-<!--
         <S-Left> or <C-Left>    one word left
         <S-Right> or <C-Right>  one word right
         CTRL-B or <Home>        to begin of command line
@@ -59,13 +58,11 @@ The most often used keys to move around in the command line:
         for the other Shift and Control combinations.
 
 You can also use the mouse to move the cursor.
--->
 
 
 DELETING
 
 As mentioned, <BS> deletes the character before the cursor.
-<!--
   To delete a whole
 word use CTRL-W.
 
@@ -78,8 +75,6 @@ word use CTRL-W.
 CTRL-U removes all text, thus allows you to start all over again.
 
 
--->
-<!--
 OVERSTRIKE
 
 The <Insert> key toggles between inserting characters and replacing the
@@ -100,7 +95,6 @@ from overstrike to inserting, and type the space:
         /the great pig ~
 
 
--->
 CANCELLING
 
 You thought of executing a : or / command, but changed your mind.  To get rid
@@ -295,8 +289,6 @@ More about all of this here: |cmdline-completion|
 ==============================================================================
 *20.4*  Command line history
 
-This functionality is not currently support by @NAME@.
-<!--
 In chapter 3 we briefly mentioned the history.  The basics are that you can
 use the <Up> key to recall an older command line.  <Down> then takes you back
 to newer commands.
@@ -332,6 +324,7 @@ command: >
 
         :history /
 
+<!--
 CTRL-P will work like <Up>, except that it doesn't matter what you already
 typed.  Similarly for CTRL-N and <Down>.  CTRL-P stands for previous, CTRL-N
 for next.
