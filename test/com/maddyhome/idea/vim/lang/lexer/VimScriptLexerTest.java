@@ -26,71 +26,128 @@ public class VimScriptLexerTest {
   public void testTokenFile() {
     final IElementType [] expected = {
         VimScriptTokenTypes.OP_EQUAL_TO,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_NOT_EQUAL_TO,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_GT_EQ,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_GT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_LT_EQ,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_LT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_MATCHES,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_NOT_MATCHES,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_LOGICAL_OR,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_LOGICAL_AND,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_PLUS,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_MINUS,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_MULT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_DIV,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_MOD,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OP_ASSIGN,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.INTEGER,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.INTEGER,
         VimScriptTokenTypes.WHITESPACE,
         VimScriptTokenTypes.INTEGER,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.FLOAT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.FLOAT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.FLOAT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.FLOAT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.FLOAT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.FLOAT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.FLOAT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.INTEGER,
         VimScriptTokenTypes.DOT,
         VimScriptTokenTypes.WHITESPACE,
         VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.INTEGER,
         VimScriptTokenTypes.IDENTIFIER,
         VimScriptTokenTypes.WHITESPACE,
         VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.VARIABLE_WITH_PREFIX,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.VARIABLE_WITH_PREFIX,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.VARIABLE_WITH_PREFIX,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.IDENTIFIER,
         VimScriptTokenTypes.COLON,
         VimScriptTokenTypes.IDENTIFIER,
         VimScriptTokenTypes.WHITESPACE,
         VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.ENVIRONMENT_VARIABLE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.OPTION,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.REGISTER,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.IDENTIFIER,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.IDENTIFIER,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.IDENTIFIER,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.STRING,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.STRING,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.LEFT_ROUND_BRACKET,
         VimScriptTokenTypes.RIGHT_ROUND_BRACKET,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.LEFT_SQUARE_BRACKET,
         VimScriptTokenTypes.RIGHT_SQUARE_BRACKET,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.LEFT_CURLY_BRACKET,
         VimScriptTokenTypes.RIGHT_CURLY_BRACKET,
+        VimScriptTokenTypes.NEW_LINE,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.COLON,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.DOT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.BAD_CHARACTER,
         VimScriptTokenTypes.WHITESPACE,
         VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.QUESTION_MARK,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.EXCLAMATION_MARK,
         null
     };
@@ -100,7 +157,7 @@ public class VimScriptLexerTest {
       ArrayList<IElementType> actual = new ArrayList<IElementType>();
 
       VimScriptFlexLexer lexer = new VimScriptFlexLexer();
-      final String data = read(file);
+      final String data = readFile(file);
       lexer.start(data);
       while (true) {
         IElementType token = lexer.getTokenType();
@@ -109,6 +166,14 @@ public class VimScriptLexerTest {
           break;
         }
         lexer.advance();
+      }
+
+      for (int i = 0; i != expected.length; ++i) {
+        System.out.print(expected[i] + " ");
+      }
+      System.out.println();
+      for (int i = 0; i != actual.size(); ++i) {
+        System.out.print(actual.get(i) + " ");
       }
 
       Assert.assertArrayEquals(expected, actual.toArray());
@@ -121,6 +186,8 @@ public class VimScriptLexerTest {
   @Test
   public void testExpression() {
     IElementType [] expected = {
+        VimScriptTokenTypes.COMMENT,
+        VimScriptTokenTypes.NEW_LINE,
         VimScriptTokenTypes.IDENTIFIER,
         VimScriptTokenTypes.WHITESPACE,
         VimScriptTokenTypes.VARIABLE_WITH_PREFIX,
@@ -167,18 +234,5 @@ public class VimScriptLexerTest {
       b.append(buf, 0, n);
     }
     return b.toString();
-  }
-
-  private static String read(File file) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    BufferedReader br = new BufferedReader(new FileReader(file));
-    while (true) {
-      String line = br.readLine();
-      if (line == null) {
-        break;
-      }
-      sb.append(line).append('\n');
-    }
-    return sb.toString();
   }
 }

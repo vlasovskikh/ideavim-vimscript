@@ -15,6 +15,7 @@ import com.intellij.psi.tree.TokenSet;
 public interface VimScriptTokenTypes {
   public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
   public static final IElementType WHITESPACE = TokenType.WHITE_SPACE;
+  public static final IElementType NEW_LINE = TokenType.NEW_LINE_INDENT;
 
   public static final TokenSet whitespaces = TokenSet.create(WHITESPACE);
 
@@ -51,6 +52,8 @@ public interface VimScriptTokenTypes {
 
   public static final IElementType OP_LOGICAL_OR = new VimScriptElementType("||");
   public static final IElementType OP_LOGICAL_AND = new VimScriptElementType("&&");
+
+  public static final IElementType AMPERSAND = new VimScriptElementType("&");
 
   /* separators */
   public static final IElementType COLON = new VimScriptElementType(":");

@@ -41,7 +41,7 @@ Float = [-+]?(0 | [1-9]{Digit}*)\.({Digit}+)([eE][-+]?{Digit}*)?
 String = {InputChar}+
 
 //Comment
-Comment = {InputChar}*[^\'\"]
+Comment = {InputChar}*
 
 //Identifier
 Name = [A-Za-z_][_A-Za-z0-9]*
@@ -52,6 +52,8 @@ Register = @{Name}
 Identifier = {Name}
 
 %%
+
+{NewLineChar}               { return NEW_LINE; }
 
 // operators
 //logic operators
@@ -84,9 +86,9 @@ Identifier = {Name}
 {Register}                  { return REGISTER; }
 {Identifier}                { return IDENTIFIER; }
 
-\"{Comment}{NewLineChar}    { return COMMENT; }
 \'{String}\'                |
 \"{String}\"                { return STRING; }
+\"{Comment}                 { return COMMENT; }
 
 // braces
 "("                         { return LEFT_ROUND_BRACKET; }
@@ -97,6 +99,7 @@ Identifier = {Name}
 "}"                         { return RIGHT_CURLY_BRACKET; }
 
 // separators
+"&"                         { return AMPERSAND; }
 ":"                         { return COLON; }
 "."                         { return DOT; }
 "?"                         { return QUESTION_MARK; }
@@ -107,7 +110,6 @@ Identifier = {Name}
 "\""                        { return DOUBLE_QUOTE; }
 
 {SpaceChar}                 { return WHITESPACE; }
-{NewLineChar}               {}
 
 <<EOF>>                     { return null; }
 .                           { return BAD_CHARACTER; }

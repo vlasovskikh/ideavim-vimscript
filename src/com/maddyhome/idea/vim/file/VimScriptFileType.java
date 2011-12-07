@@ -22,7 +22,7 @@ public class VimScriptFileType extends LanguageFileType {
 
   public static final String DEFAULT_EXTENSION = "vim";
 
-  public static final String [] extensions = {DEFAULT_EXTENSION}; //TODO: add "vimrc" or not?
+  public static final String [] extensions = {DEFAULT_EXTENSION, "vimrc"};
 
   protected VimScriptFileType() {
     super(new VimScriptLanguage());
@@ -45,6 +45,6 @@ public class VimScriptFileType extends LanguageFileType {
 
   @Nullable
   public Icon getIcon() {
-    return IconLoader.findIcon("/icons/logo.png"); //TODO: am I really should do this?
+    return IconLoader.findIcon("/icons/logo.png");
   }
 }
