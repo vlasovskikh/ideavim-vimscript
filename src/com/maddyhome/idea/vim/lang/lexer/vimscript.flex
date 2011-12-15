@@ -68,15 +68,20 @@ Identifier = {Name}
 "||"                        { return OP_LOGICAL_OR; }
 "&&"                        { return OP_LOGICAL_AND; }
 
+//assign operators
+"+="                        { return OP_PLUS_ASSIGN; }
+"-="                        { return OP_MINUS_ASSIGN; }
+"*="                        { return OP_MULT_ASSIGN; }
+"/="                        { return OP_DIV_ASSIGN; }
+"^="                        { return OP_CIRCUMFLEX_ASSIGN; }
+"="                         { return OP_ASSIGN; }
+
 //unary operators
 "+"                         { return OP_PLUS; }
 "-"                         { return OP_MINUS; }
 "*"                         { return OP_MULT; }
 "/"                         { return OP_DIV; }
 "%"                         { return OP_MOD; }
-
-"="                         { return OP_ASSIGN; }
-
 
 {Float}                     { return FLOAT; }
 {Integer}                   { return INTEGER; }

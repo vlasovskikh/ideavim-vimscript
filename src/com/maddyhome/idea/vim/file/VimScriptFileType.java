@@ -30,7 +30,7 @@ public class VimScriptFileType extends LanguageFileType {
 
   @NotNull
   public String getName() {
-    return "VimScript";
+    return "VimScriptFile";
   }
 
   @NotNull
