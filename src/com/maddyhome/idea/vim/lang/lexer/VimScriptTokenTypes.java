@@ -93,9 +93,13 @@ public interface VimScriptTokenTypes {
 
   /* string */
   public static final IElementType STRING = new VimScriptElementType("string");
-  public static final TokenSet strings = TokenSet.create(STRING);
+  public static final TokenSet strings = TokenSet.create(
+      STRING
+  );
 
   /* comment */
   public static final IElementType COMMENT = new VimScriptElementType("comment");
-  public static final TokenSet comments = TokenSet.create(COMMENT);
+  public static final TokenSet comments = TokenSet.create(
+      COMMENT
+  );
 }

@@ -7,8 +7,6 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.logging.Logger;
-
 import static com.maddyhome.idea.vim.lang.parser.VimScriptElementTypes.*;
 import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
 
@@ -49,8 +47,15 @@ public class VimScriptParser implements PsiParser {
       if (!parseSetStmt(mark)) {
         mark.drop();
         builder.error("Could not parse set stmt");
-
       }
+
+    } else if (atToken(WHITESPACE)) {
+      skipWhitespaces();
+
+    }
+    else  if (atToken(NEW_LINE)) {
+      advanceLexer();
+
     } else {
       builder.error("Set expression expected");
       advanceToNewLine();
@@ -226,36 +231,32 @@ public class VimScriptParser implements PsiParser {
   }
 
   private void advanceLexer() {
-    System.out.print(builder.getTokenType() + ": " + builder.getTokenText() + " advance to ");
+    //System.out.print(builder.getTokenType() + ": " + builder.getTokenText() + " advance to ");
     builder.advanceLexer();
-    System.out.println(builder.getTokenType() + ": " + builder.getTokenText());
+    //System.out.println(builder.getTokenType() + ": " + builder.getTokenText());
   }
 
   private void advanceLexerSkippingWhitespaces() {
-    System.out.println("advance skipping ws");
     do {
       advanceLexer();
     } while (atToken(WHITESPACE) && !builder.eof());
   }
 
   private void advanceUntilNewLine() {
-    System.out.println("advance until nl");
     do {
       advanceLexer();
     } while (!atToken(NEW_LINE) && !builder.eof());
   }
 
   private void advanceToNewLine() {
-    System.out.println("advance to nl");
-    while (!atToken(NEW_LINE)) {
+    while (!atToken(NEW_LINE) && !builder.eof()) {
       advanceLexer();
     }
     advanceLexer();
   }
 
   private void skipWhitespaces() {
-    System.out.println("skip ws");
-    while (atToken(WHITESPACE)) {
+    while (atToken(WHITESPACE) && !builder.eof()) {
       advanceLexer();
     }
   }
