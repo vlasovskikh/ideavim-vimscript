@@ -15,10 +15,12 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.intellij.codeInsight.lookup.Lookup;
-import com.intellij.codeInsight.lookup.LookupManager;
-import com.intellij.ide.AppLifecycleListener;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -31,15 +33,14 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
-import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.util.messages.MessageBus;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
@@ -52,10 +53,8 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 import com.intellij.lexer.XmlLexer;
 
@@ -80,43 +79,40 @@ import com.intellij.lexer.XmlLexer;
 public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element>
 {
 
-  private static VimPlugin instance;
+  private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
+  public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
+  public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
+
+  private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
+  private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
+  private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
+
   private VimTypedActionHandler vimHandler;
   private RegisterActions actions;
   private boolean isBlockCursor = false;
-  private boolean isSmoothScrolling = false;
+  private boolean isAnimatedScrolling = false;
+  private boolean isRefrainFromScrolling = false;
+
   private String previousKeyMap = "";
 
-  // Make VIM plugin disabled by default to fix mess with keyboard changes
-  private boolean enabled = false;
-  private static Logger LOG = Logger.getInstance(VimPlugin.class.getName());
+  // It is enabled by default to avoid any special configuration after plugin installation
+  private boolean enabled = true;
 
-  private PropertyChangeListener myLookupPropertiesListener;
+  private static Logger LOG = Logger.getInstance(VimPlugin.class);
+
+  private final Application myApp;
+
 
   /**
    * Creates the Vim Plugin
    */
-  public VimPlugin(final MessageBus bus) {
+  public VimPlugin(final Application app) {
+    myApp = app;
     LOG.debug("VimPlugin ctr");
-    instance = this;
-
-    bus.connect().subscribe(AppLifecycleListener.TOPIC, new AppLifecycleListener.Adapter() {
-      @Override
-      public void appFrameCreated(String[] commandLineArgs, @NotNull Ref<Boolean> willOpenProject) {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-          public void run() {
-            // Ensure that Vim keymap is installed and install if not
-            VimKeyMapUtil.installKeyBoardBindings(instance);
-            // Turn on proper keymap
-            //VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
-          }
-        });
-      }
-    });
   }
 
   public static VimPlugin getInstance() {
-    return instance;
+    return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
   }
 
   /**
@@ -126,7 +122,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    */
   @NotNull
   public String getComponentName() {
-    return "VimPlugin";
+    return IDEAVIM_COMPONENT_NAME;
   }
 
   public String getPreviousKeyMap() {
@@ -138,10 +134,16 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   /**
-   * Initialize the Vim Plugin. This plugs the vim key handler into the editor action mananger.
+   * Initialize the Vim Plugin. This plugs the vim key handler into the editor action manager.
    */
   public void initComponent() {
     LOG.debug("initComponent");
+
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
+      public void run() {
+        checkAndInstallKeymap();
+      }
+    });
 
     EditorActionManager manager = EditorActionManager.getInstance();
     TypedAction action = manager.getTypedAction();
@@ -158,6 +160,38 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     LOG.debug("done");
   }
 
+  private static void checkAndInstallKeymap() {
+    // Ensure that Vim keymap is installed and install if not.
+    // Moreover we can use installed keymap as indicator of the first time installed plugin
+    if (VimPlugin.isEnabled()) {
+      boolean vimKeyMapInstalled = VimKeyMapUtil.isVimKeymapInstalled();
+      // In case if keymap wasn't installed, we assume that this is the first launch after installation
+      if (!vimKeyMapInstalled) {
+        vimKeyMapInstalled = VimKeyMapUtil.installKeyBoardBindings();
+        if (!vimKeyMapInstalled) {
+          if (Messages.showYesNoDialog("It is crucial to use Vim keymap for IdeaVim plugin correct work, " +
+                                       "however it was not installed correctly.\nDo you want " +
+                                       ApplicationManagerEx.getApplicationEx().getName() +
+                                       " to disable Vim emulation?", IDEAVIM_NOTIFICATION_TITLE, Messages.getQuestionIcon()) == Messages.YES) {
+            VimPlugin.getInstance().turnOffPlugin();
+            return;
+          }
+
+        }
+        // Enable proper keymap bindings
+        VimKeyMapUtil.switchKeymapBindings(true);
+      }
+      // In this case we should warn if user doesn't use vim keymap
+      else {
+        if (!VimKeyMapUtil.isVimKeymapUsed()) {
+          Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                                    "Vim keymap is not active, IdeaVim plugin may work incorrectly",
+                                                    NotificationType.WARNING));
+        }
+      }
+    }
+  }
+
   /**
    * This sets up some listeners so we can handle various events that occur
    */
@@ -170,66 +204,41 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       public void editorCreated(EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         isBlockCursor = editor.getSettings().isBlockCursor();
-        isSmoothScrolling = editor.getSettings().isAnimatedScrolling();
+        isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
+        isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
         EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
 
         if (VimPlugin.isEnabled()) {
           // Turn on insert mode if editor doesn't have any file
           if (!EditorData.isFileEditor(editor) && !CommandState.inInsertMode(editor)) {
-            CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+            KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
-          editor.getSettings().setAnimatedScrolling(false);
+          editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
+          editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
         }
       }
 
       public void editorReleased(EditorFactoryEvent event) {
         EditorData.uninitializeEditor(event.getEditor());
-        event.getEditor().getSettings().setAnimatedScrolling(isSmoothScrolling);
+        event.getEditor().getSettings().setAnimatedScrolling(isAnimatedScrolling);
+        event.getEditor().getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
         DocumentManager.getInstance().removeListeners(event.getEditor().getDocument());
       }
-    });
+    }, myApp);
 
     // Since the Vim plugin custom actions aren't available to the call to <code>initComponent()</code>
     // we need to force the generation of the key map when the first project is opened.
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
-      public void projectOpened(Project project) {
-        listeners.add(new MotionGroup.MotionEditorChange());
-        listeners.add(new FileGroup.SelectionCheck());
-        listeners.add(new SearchGroup.EditorSelectionCheck());
-
-        for (FileEditorManagerListener listener : listeners) {
-          FileEditorManager.getInstance(project).addFileEditorManagerListener(listener);
-        }
-
-        myLookupPropertiesListener = new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent evt) {
-            if (LookupManager.PROP_ACTIVE_LOOKUP.equals(evt.getPropertyName())) {
-              final Lookup lookup = (Lookup)evt.getNewValue();
-              if (lookup != null && lookup.isFocused()) {
-                final Editor editor = lookup.getEditor();
-                // Do not toggle on insert mode if already in it.
-                if (!CommandState.inInsertMode(editor)){
-                  CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
-                }
-              }
-            }
-          }
-        };
-        LookupManager.getInstance(project).addPropertyChangeListener(myLookupPropertiesListener);
+      public void projectOpened(final Project project) {
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
       }
 
-      public void projectClosed(Project project) {
-        for (FileEditorManagerListener listener : listeners) {
-          FileEditorManager.getInstance(project).removeFileEditorManagerListener(listener);
-        }
-        LookupManager.getInstance(project).removePropertyChangeListener(myLookupPropertiesListener);
-        listeners.clear();
+      public void projectClosed(final Project project) {
       }
-
-      ArrayList<FileEditorManagerListener> listeners = new ArrayList<FileEditorManagerListener>();
     });
 
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
@@ -285,18 +294,18 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     return getInstance().enabled;
   }
 
-  public static void setEnabled(boolean set) {
-    if (!set) {
+  public static void setEnabled(final boolean enabled) {
+    if (!enabled) {
       getInstance().turnOffPlugin();
     }
 
-    getInstance().enabled = set;
+    getInstance().enabled = enabled;
 
-    if (set) {
+    if (enabled) {
       getInstance().turnOnPlugin();
     }
 
-    VimKeyMapUtil.enableKeyBoardBindings(set);
+    VimKeyMapUtil.switchKeymapBindings(enabled);
   }
 
   /**
@@ -328,8 +337,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   public void turnOnPlugin() {
     KeyHandler.getInstance().fullReset(null);
-    setCursors(true);
-    setSmoothScrolling(false);
+    setCursors(BLOCK_CURSOR_VIM_VALUE);
+    setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
+    setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
 
     CommandGroups.getInstance().getMotion().turnOn();
   }
@@ -337,7 +347,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
     setCursors(isBlockCursor);
-    setSmoothScrolling(isSmoothScrolling);
+    setAnimatedScrolling(isAnimatedScrolling);
+    setRefrainFromScrolling(isRefrainFromScrolling);
 
     CommandGroups.getInstance().getMotion().turnOff();
   }
@@ -345,17 +356,25 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private void setCursors(boolean isBlock) {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
+      // Vim plugin should be turned on in insert mode
+      ((EditorEx)editor).setInsertMode(true);
       editor.getSettings().setBlockCursor(isBlock);
     }
   }
 
-  private void setSmoothScrolling(boolean isOn) {
+  private void setAnimatedScrolling(boolean isOn) {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
       editor.getSettings().setAnimatedScrolling(isOn);
     }
   }
 
+  private void setRefrainFromScrolling(boolean isOn) {
+    Editor[] editors = EditorFactory.getInstance().getAllEditors();
+    for (Editor editor : editors) {
+      editor.getSettings().setRefrainFromScrolling(isOn);
+    }
+  }
 
   private RegisterActions getActions() {
     if (actions == null) {
