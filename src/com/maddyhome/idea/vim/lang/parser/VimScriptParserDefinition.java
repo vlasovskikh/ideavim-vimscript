@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class VimScriptParserDefinition implements ParserDefinition {
  public static final IFileElementType VIM_SCRIPT_FILE =
-      new IFileElementType("VimScript", VimScriptFileType.VIM_SCRIPT_LANGUAGE);
+      new IFileElementType("VimScriptFile", VimScriptFileType.VIM_SCRIPT_LANGUAGE);
 
   @NotNull
   @Override

@@ -15,17 +15,30 @@
  */
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.codeInsight.hint.QuestionAction;
+import com.intellij.lang.ASTNode;
+import com.intellij.mock.MockProject;
+import com.intellij.mock.MockPsiManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.PsiFileFactoryImpl;
+import com.intellij.psi.tree.IElementType;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.lang.psi.SetOption;
+import com.maddyhome.idea.vim.lang.psi.SetStatement;
 import com.maddyhome.idea.vim.ui.MorePanel;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.*;
+
+import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
+import static com.maddyhome.idea.vim.lang.parser.VimScriptElementTypes.*;
 
 /**
  * Maintains the set of support options
@@ -69,7 +82,6 @@ public class Options {
     if (res == null) {
       res = abbrevs.get(name);
     }
-
     return res;
   }
 
@@ -416,6 +428,244 @@ public class Options {
     loadVimrc();
   }
 
+  private int countOptions(PsiElement [] elements) {
+    int count = 0;
+    for (PsiElement e : elements) {
+      if (e instanceof SetOption) {
+        ++count;
+      }
+    }
+    return count;
+  }
+
+  /*
+   * Parses .vimrc file.
+   */
+  public boolean getAndParseSetStatements(Editor editor, PsiElement element, boolean failOnBad) {
+    PsiElement [] children = element.getChildren();
+
+    String error = null;
+    String token = null;
+
+    if (element instanceof SetStatement) {
+      int optionCount = countOptions(children);
+
+      // :set
+      // No arguments so we show changed values
+      if (optionCount == 0) {
+        showOptions(editor, changedOptions(), true);
+        return true;
+      }
+
+      // :set all
+      // Arg is all so show all options
+      if (optionCount == 1 && "all".equals(element.getChildren()[1].getText())) {
+        showOptions(editor, allOptions(), true);
+        return true;
+      }
+
+      // Reset all options to default
+      else if (optionCount == 1 && "all&".equals(element.getChildren()[1].getText())) {
+        resetAllOptions();
+        return true;
+      }
+
+      // We now have 1 or more option operators
+      ArrayList<Option> toShow = new ArrayList<Option>();
+
+      for (PsiElement child : children) {
+        if (child instanceof SetOption) {
+          token = child.getText();
+          ASTNode [] nodes = child.getNode().getChildren(null);
+          int nodeCount = nodes.length;
+
+          if (nodeCount == 0) continue;
+
+          if (nodeCount == 1) {
+
+            // :se[t] no{option}
+            // Toggle option: Reset, switch it off.
+            if (nodes[0].getText().startsWith("no")) {
+              String option = nodes[0].getText().substring(2);
+              Option opt = getOption(option);
+              if (opt != null) {
+                if (opt instanceof ToggleOption) {
+                  ((ToggleOption)opt).reset();
+                }
+                else {
+                  error = Msg.e_invarg;
+                }
+              }
+              else {
+                error = Msg.unkopt;
+              }
+            }
+
+            // :se[t] inv{option}
+            // Toggle option: Invert value.
+            else if (nodes[0].getText().startsWith("inv")) {
+              String option = child.getFirstChild().getText().substring(3);
+              Option opt = getOption(option);
+              if (opt != null) {
+                if (opt instanceof ToggleOption) {
+                  ((ToggleOption)opt).toggle();
+                }
+                else {
+                  error = Msg.e_invarg;
+                }
+              }
+              else {
+                error = Msg.unkopt;
+              }
+            }
+
+            // :se[t] {option}
+            // Toggle option: set, switch it on.
+            // Number option: show value.
+            // String option: show value.
+            else {
+              String option = nodes[0].getText();
+              Option opt = getOption(option);
+              if (opt != null) {
+                if (opt instanceof ToggleOption) {
+                  System.out.println(option);
+                  ((ToggleOption)opt).set();
+                } else {
+                  toShow.add(opt);
+                }
+              }
+              else {
+                error = Msg.unkopt;
+              }
+            }
+
+            continue;
+          }
+
+          if (nodeCount == 2) {
+            // :se[t] {option}?
+            // Show value of {option}.
+            if (QUESTION_MARK.equals(nodes[1].getElementType())) {
+              String option = nodes[0].getText();
+              Option opt = getOption(option);
+              if (opt != null) {
+                toShow.add(opt);
+              }
+              else {
+                error = Msg.unkopt;
+              }
+            }
+
+            // :se[t] {option}!
+            // Toggle option: Invert value.
+            else if (EXCLAMATION_MARK.equals(nodes[1].getElementType())) {
+              String option = nodes[0].getText();
+              Option opt = getOption(option);
+              if (opt != null) {
+                if (opt instanceof ToggleOption) {
+                  ((ToggleOption)opt).toggle();
+                }
+                else {
+                  error = Msg.e_invarg;
+                }
+              }
+              else {
+                error = Msg.unkopt;
+              }
+            }
+
+            // :se[t] {option}&
+            // Reset option to its default value.
+            else if (AMPERSAND.equals(nodes[1].getElementType())) {
+              String option = nodes[0].getText();
+              Option opt = getOption(option);
+              if (opt != null) {
+                opt.resetDefault();
+              }
+              else {
+                error = Msg.unkopt;
+              }
+            }
+          }
+
+          else /*if (nodeCount == 3)*/ {
+            String option = nodes[0].getText();
+            IElementType operator = nodes[1].getElementType();
+            String value = nodes[2].getText();
+            Option opt = getOption(option);
+            if (opt != null) {
+              if (opt instanceof TextOption) {
+                TextOption to = (TextOption)opt;
+                boolean res = false;
+
+                // :se[t] {option}={value}		or
+                // :se[t] {option}:{value}
+                // Set string or number option to {value}.
+                if (OP_ASSIGN.equals(operator) || COLON.equals(operator)) {
+                  res = to.set(value);
+                }
+
+                // :se[t] {option}+={value}
+                // Add the {value} to a number option, or append the {value} to a string option.
+                else if (OP_PLUS_ASSIGN.equals(operator)) {
+                  res = to.append(value);
+                }
+
+                // :se[t] {option}-={value}
+                // Subtract the {value} from a number option, or remove the {value} from a string option, if it is there.
+                else if (OP_MINUS_ASSIGN.equals(operator)) {
+                  res = to.remove(value);
+                }
+
+                // :se[t] {option}^={value}
+                // Multiply the {value} to a number option, or prepend the {value} to a string option.
+                else if (OP_CIRCUMFLEX_ASSIGN.equals(operator)) {
+                  res = to.prepend(value);
+                }
+
+                if (!res) {
+                  error = Msg.e_invarg;
+                }
+              }
+              else {
+                error = Msg.e_invarg;
+              }
+            }
+            else {
+              error = Msg.unkopt;
+            }
+          }
+        }
+        if (failOnBad && error != null) {
+          break;
+        }
+      }
+
+      if (toShow.size() > 0) {
+        showOptions(editor, toShow, false);
+      }
+
+      if (editor != null && error != null) {
+        VimPlugin.showMessage(MessageHelper.message(error, token));
+        VimPlugin.indicateError();
+      }
+    }
+    else {
+      for (PsiElement e : children) {
+        getAndParseSetStatements(editor, e, failOnBad);
+      }
+    }
+    return error == null;
+  }
+
+  public boolean parseOptionLine(Editor editor, ExCommand cmd, boolean failOnBad) {
+    PsiFileFactory psiFileFactory = new PsiFileFactoryImpl(new MockPsiManager(new MockProject()));
+    PsiFile psiFile = psiFileFactory.createFileFromText("vimrc.vim", cmd.getCommand() + " " + cmd.getArgument());
+
+    boolean result = Options.getInstance().getAndParseSetStatements(editor, psiFile, failOnBad);
+    return result;
+  }
+
   /**
    * Attempts to load all :set commands from the user's .vimrc file if found
    */
@@ -434,14 +684,18 @@ public class Options {
       if (logger.isDebugEnabled()) logger.debug("found vimrc at " + rc);
 
       try {
-        BufferedReader br = new BufferedReader(new FileReader(rc));
-        String line;
-        while ((line = br.readLine()) != null) {
-          if (line.startsWith(":set") || line.startsWith("set")) {
-            int pos = line.indexOf(' ');
-            parseOptionLine(null, line.substring(pos).trim(), false);
-          }
+        String rcText = FileUtil.loadFile(rc);
+        PsiFileFactory psiFileFactory = new PsiFileFactoryImpl(new MockPsiManager(new MockProject()));
+        PsiFile rcPsiFile = psiFileFactory.createFileFromText("vimrc.vim", rcText);
+        Editor editor = null;
+        Collection<Option> toShow = new ArrayList<Option>();
+        getAndParseSetStatements(editor, rcPsiFile, false);
+
+        // Now show all options that were individually requested
+        if (toShow.size() > 0) {
+          showOptions(editor, toShow, false);
         }
+
       }
       catch (Exception e) {
         // no-op
@@ -457,7 +711,7 @@ public class Options {
     addOption(new ToggleOption("gdefault", "gd", false));
     addOption(new NumberOption("history", "hi", 20, 1, Integer.MAX_VALUE));
     addOption(new ToggleOption("hlsearch", "hls", false));
-    addOption(new ToggleOption("ignorecase", "ic", false));
+    addOption(new ToggleOption("ignorecase", "ic", true));
     addOption(new ListOption("matchpairs", "mps", new String[]{"(:)", "{:}", "[:]"}, ".:."));
     addOption(new ToggleOption("more", "more", true));
     addOption(new BoundListOption("nrformats", "nf", new String[]{"octal", "hex"}, new String[]{"octal", "hex", "alpha"}));

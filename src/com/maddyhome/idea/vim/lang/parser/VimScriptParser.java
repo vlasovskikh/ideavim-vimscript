@@ -65,7 +65,7 @@ public class VimScriptParser implements PsiParser {
 
   /**
    * Parses 'set' statements.
-   * @param startMark before 'set' keyword.
+   * @param startMark marks the position before 'set' keyword.
    * @return true if parsed successful, false otherwise.
    */
   private boolean parseSetStmt(PsiBuilder.Marker startMark) {
@@ -94,11 +94,11 @@ public class VimScriptParser implements PsiParser {
 
   private boolean parseOptions() {
     do {
-      if (builder.getTokenType() != null) {
-        System.out.println(builder.getTokenType() + ": " + builder.getTokenText());
-      } else {
-        System.out.print("!");
-      }
+//      if (builder.getTokenType() != null) {
+//        System.out.println(builder.getTokenType() + ": " + builder.getTokenText());
+//      } else {
+//        System.out.print("!");
+//      }
 
       if (atToken(IDENTIFIER, "all")) {
         PsiBuilder.Marker mark = builder.mark();

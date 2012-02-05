@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.lang.lexer;
 
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.tree.IElementType;
 import org.junit.*;
 
@@ -157,7 +158,7 @@ public class VimScriptLexerTest {
       ArrayList<IElementType> actual = new ArrayList<IElementType>();
 
       VimScriptFlexLexer lexer = new VimScriptFlexLexer();
-      final String data = readFile(file);
+      final String data = FileUtil.loadFile(file);
       lexer.start(data);
       while (true) {
         IElementType token = lexer.getTokenType();
@@ -167,7 +168,8 @@ public class VimScriptLexerTest {
         }
         lexer.advance();
       }
-
+      /*
+      //Uncomment this to see where is the problem.
       for (int i = 0; i != expected.length; ++i) {
         System.out.print(expected[i] + " ");
       }
@@ -175,7 +177,7 @@ public class VimScriptLexerTest {
       for (int i = 0; i != actual.size(); ++i) {
         System.out.print(actual.get(i) + " ");
       }
-
+      */
       Assert.assertArrayEquals(expected, actual.toArray());
 
     } catch (IOException ioe) {
@@ -202,7 +204,7 @@ public class VimScriptLexerTest {
       File file = new File(dir + test + "1.vim");
 
       VimScriptFlexLexer lexer = new VimScriptFlexLexer();
-      final String data = readFile(file);
+      final String data = FileUtil.loadFile(file);
 
       lexer.start(data);
 
@@ -220,19 +222,5 @@ public class VimScriptLexerTest {
     }
 
     Assert.assertArrayEquals(expected, actual.toArray());
-  }
-
-  private static String readFile(File file) throws IOException {
-    StringBuilder b = new StringBuilder();
-    FileReader fr = new FileReader(file);
-    char[] buf = new char[4096];
-    while (true) {
-      int n = fr.read(buf);
-      if (n < 0) {
-        break;
-      }
-      b.append(buf, 0, n);
-    }
-    return b.toString();
   }
 }

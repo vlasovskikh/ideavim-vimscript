@@ -4,8 +4,8 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 
-import com.maddyhome.idea.vim.lang.psi.Block;
-import com.maddyhome.idea.vim.lang.psi.SetStatement;
+import com.maddyhome.idea.vim.lang.lexer.VimScriptElementType;
+import com.maddyhome.idea.vim.lang.psi.*;
 
 /**
  * <p>Date: 09.11.11</p>
@@ -18,6 +18,14 @@ public class VimScriptPsiCreator {
 
     //return node.getPsi();
 
+    if (VimScriptElementTypes.SET_OPTION.equals(node.getElementType())) {
+      return new SetOption(node);
+    }
+
+    if (VimScriptElementTypes.KEYWORD.equals(node.getElementType())) {
+      return new Keyword(node);
+    }
+
     if (VimScriptElementTypes.SET_STMT.equals(node.getElementType())) {
       return new SetStatement(node);
     }
@@ -26,6 +34,6 @@ public class VimScriptPsiCreator {
       return new Block(node);
     }
 
-    return new ASTWrapperPsiElement(node);
+    return new PsiVimScriptTokenImpl(node.getElementType(), node.getText());
   }
 }
