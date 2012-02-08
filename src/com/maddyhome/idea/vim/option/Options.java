@@ -15,7 +15,6 @@
  */
 package com.maddyhome.idea.vim.option;
 
-import com.intellij.codeInsight.hint.QuestionAction;
 import com.intellij.lang.ASTNode;
 import com.intellij.mock.MockProject;
 import com.intellij.mock.MockPsiManager;
@@ -33,21 +32,19 @@ import com.maddyhome.idea.vim.lang.psi.SetOption;
 import com.maddyhome.idea.vim.lang.psi.SetStatement;
 import com.maddyhome.idea.vim.ui.MorePanel;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.util.*;
 
 import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
-import static com.maddyhome.idea.vim.lang.parser.VimScriptElementTypes.*;
 
 /**
- * Maintains the set of support options
+ * Maintains the set of supported options.
  */
 public class Options {
   /**
-   * Gets the singleton instance of the options
+   * Gets the singleton instance of the options.
    *
-   * @return The singleton
+   * @return The singleton instance.
    */
   public synchronized static Options getInstance() {
     if (ourInstance == null) {
@@ -57,10 +54,10 @@ public class Options {
   }
 
   /**
-   * Convenience method to check if a boolean option is set or not
+   * Convenience method to check if a boolean option is set or not.
    *
-   * @param name The name of the option to check
-   * @return True if set, false if not set or name is invalid or not a boolean option
+   * @param name The name of the option to check.
+   * @return True if set, false if not set or name is invalid or not a boolean option.
    */
   public boolean isSet(String name) {
     Option opt = getOption(name);
@@ -74,8 +71,8 @@ public class Options {
   /**
    * Gets an option by the supplied name or short name.
    *
-   * @param name The option's name or short name
-   * @return The option with the given name or short name. null if there is no such option
+   * @param name The option's name or short name.
+   * @return The option with the given name or short name. null if there is no such option.
    */
   public Option getOption(String name) {
     Option res = options.get(name);
@@ -86,18 +83,18 @@ public class Options {
   }
 
   /**
-   * Gets all options
+   * Gets all options.
    *
-   * @return All options
+   * @return Collection of all options.
    */
   Collection<Option> allOptions() {
     return options.values();
   }
 
   /**
-   * Gets only options that have values different from their default values
+   * Gets only options that have values different from their default values.
    *
-   * @return The set of changed options
+   * @return The set of changed options.
    */
   Collection<Option> changedOptions() {
     ArrayList<Option> res = new ArrayList<Option>();
@@ -129,7 +126,7 @@ public class Options {
    * <li>:set {option}^={value} - prepend or multiply option value</li>
    * </ul>
    *
-   * @param editor    The editor the command was entered for, null if no editor - reading .vimrc
+   * @param editor    The editor the command was entered from, null if no editor - reading .vimrc
    * @param args      The :set command arguments
    * @param failOnBad True if processing should stop when a bad argument is found, false if a bad argument is simply
    *                  skipped and processing continues.
@@ -333,7 +330,7 @@ public class Options {
   }
 
   /**
-   * Resets all options to their default value
+   * Resets all options to their default value.
    */
   private void resetAllOptions() {
     Collection<Option> opts = allOptions();
@@ -343,11 +340,11 @@ public class Options {
   }
 
   /**
-   * Shows the set of options
+   * Shows the set of options.
    *
-   * @param editor    The editor to show them in - if null, this is aborted
-   * @param opts      The list of options to display
-   * @param showIntro True if intro is displayed, false if not
+   * @param editor    The editor to show them in - if null, this is aborted.
+   * @param opts      The list of options to display.
+   * @param showIntro True if intro is displayed, false if not.
    */
   private void showOptions(Editor editor, Collection<Option> opts, boolean showIntro) {
     if (editor == null) {
@@ -421,13 +418,19 @@ public class Options {
   }
 
   /**
-   * Create all the options
+   * Create all the options.
    */
   private Options() {
     createDefaultOptions();
     loadVimrc();
   }
 
+  /**
+   * Convinience function for counting <code>SetOption</code>'s in
+   * <code>SetStatement</code> object.
+   * @param elements Array of elements that may contain SetOption objects.
+   * @return Count of SetOption objects in <code>elements</code> array.
+   */
   private int countOptions(PsiElement [] elements) {
     int count = 0;
     for (PsiElement e : elements) {
@@ -438,8 +441,14 @@ public class Options {
     return count;
   }
 
-  /*
-   * Parses .vimrc file.
+  /**
+   * Processes the <code>element</code> to find 'set' statements and parse them.
+   *
+   * @param editor    The editor the command was entered for, null if no editor - reading .vimrc.
+   * @param element   PsiElement to be parsed by function.
+   * @param failOnBad True if processing should stop when a bad argument is found, false if a bad argument is simply
+   *                  skipped and processing continues.
+   * @return True if no errors were found, false if there were any errors.
    */
   public boolean getAndParseSetStatements(Editor editor, PsiElement element, boolean failOnBad) {
     PsiElement [] children = element.getChildren();
@@ -528,7 +537,6 @@ public class Options {
               Option opt = getOption(option);
               if (opt != null) {
                 if (opt instanceof ToggleOption) {
-                  System.out.println(option);
                   ((ToggleOption)opt).set();
                 } else {
                   toShow.add(opt);
@@ -588,10 +596,13 @@ public class Options {
             }
           }
 
-          else /*if (nodeCount == 3)*/ {
+          else {
             String option = nodes[0].getText();
             IElementType operator = nodes[1].getElementType();
             String value = nodes[2].getText();
+            for (int i = 3; i < nodeCount; ++i) {
+              value += nodes[i].getText();
+            }
             Option opt = getOption(option);
             if (opt != null) {
               if (opt instanceof TextOption) {
@@ -658,12 +669,20 @@ public class Options {
     return error == null;
   }
 
+  /**
+   * Parses 'set' command.
+   *
+   * @param editor The editor the command was entered from.
+   * @param cmd Entered command.
+   * @param failOnBad True if processing should stop when a bad argument is found, false if a bad argument is simply
+   *                  skipped and processing continues.
+   * @return True if no errors were found, false if there were any errors.
+   */
   public boolean parseOptionLine(Editor editor, ExCommand cmd, boolean failOnBad) {
     PsiFileFactory psiFileFactory = new PsiFileFactoryImpl(new MockPsiManager(new MockProject()));
     PsiFile psiFile = psiFileFactory.createFileFromText("vimrc.vim", cmd.getCommand() + " " + cmd.getArgument());
 
-    boolean result = Options.getInstance().getAndParseSetStatements(editor, psiFile, failOnBad);
-    return result;
+    return Options.getInstance().getAndParseSetStatements(editor, psiFile, failOnBad);
   }
 
   /**
@@ -688,13 +707,7 @@ public class Options {
         PsiFileFactory psiFileFactory = new PsiFileFactoryImpl(new MockPsiManager(new MockProject()));
         PsiFile rcPsiFile = psiFileFactory.createFileFromText("vimrc.vim", rcText);
         Editor editor = null;
-        Collection<Option> toShow = new ArrayList<Option>();
         getAndParseSetStatements(editor, rcPsiFile, false);
-
-        // Now show all options that were individually requested
-        if (toShow.size() > 0) {
-          showOptions(editor, toShow, false);
-        }
 
       }
       catch (Exception e) {
@@ -704,7 +717,7 @@ public class Options {
   }
 
   /**
-   * Creates all the supported options
+   * Creates all the supported options.
    */
   private void createDefaultOptions() {
     addOption(new ToggleOption("digraph", "dg", false));

@@ -107,6 +107,7 @@ Identifier = {Name}
 "&"                         { return AMPERSAND; }
 ":"                         { return COLON; }
 "."                         { return DOT; }
+","                         { return COMMA; }
 "?"                         { return QUESTION_MARK; }
 "!"                         { return EXCLAMATION_MARK; }
 

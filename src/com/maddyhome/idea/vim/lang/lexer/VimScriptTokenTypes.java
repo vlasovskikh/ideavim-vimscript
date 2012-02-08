@@ -70,6 +70,7 @@ public interface VimScriptTokenTypes {
 
   /* separators */
   public static final IElementType COLON = new VimScriptElementType(":");
+  public static final IElementType COMMA = new VimScriptElementType(",");
   public static final IElementType DOT = new VimScriptElementType(".");
   public static final IElementType QUESTION_MARK = new VimScriptElementType("?");
   public static final IElementType EXCLAMATION_MARK = new VimScriptElementType("!");
