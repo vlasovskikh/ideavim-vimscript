@@ -729,7 +729,7 @@ public class Options {
     addOption(new ToggleOption("gdefault", "gd", false));
     addOption(new NumberOption("history", "hi", 20, 1, Integer.MAX_VALUE));
     addOption(new ToggleOption("hlsearch", "hls", false));
-    addOption(new ToggleOption("ignorecase", "ic", true));
+    addOption(new ToggleOption("ignorecase", "ic", false));
     addOption(new ListOption("matchpairs", "mps", new String[]{"(:)", "{:}", "[:]"}, ".:."));
     addOption(new ToggleOption("more", "more", true));
     addOption(new BoundListOption("nrformats", "nf", new String[]{"octal", "hex"}, new String[]{"octal", "hex", "alpha"}));
