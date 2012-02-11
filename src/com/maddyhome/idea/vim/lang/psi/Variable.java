@@ -8,7 +8,7 @@ import com.intellij.lang.ASTNode;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public class Variable extends VimScriptPsiElementImpl {
+public class Variable extends PsiVimScriptElementImpl {
   public Variable(@org.jetbrains.annotations.NotNull ASTNode node) {
     super(node);
   }

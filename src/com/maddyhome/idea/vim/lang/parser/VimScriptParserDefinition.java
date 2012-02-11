@@ -14,7 +14,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.maddyhome.idea.vim.file.VimScriptFileType;
 import com.maddyhome.idea.vim.lang.lexer.VimScriptFlexLexer;
 import com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes;
-import com.maddyhome.idea.vim.lang.psi.VimScriptPsiFile;
+import com.maddyhome.idea.vim.lang.psi.PsiVimScriptFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -69,7 +69,7 @@ public class VimScriptParserDefinition implements ParserDefinition {
 
   @Override
   public PsiFile createFile(FileViewProvider provider) {
-    return new VimScriptPsiFile(provider);
+    return new PsiVimScriptFile(provider);
   }
 
   @Override

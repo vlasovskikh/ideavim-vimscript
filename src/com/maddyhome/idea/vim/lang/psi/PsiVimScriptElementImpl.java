@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public class VimScriptPsiElementImpl extends ASTWrapperPsiElement implements VimScriptPsiElement {
-  public VimScriptPsiElementImpl(@org.jetbrains.annotations.NotNull ASTNode node) {
+public class PsiVimScriptElementImpl extends ASTWrapperPsiElement implements PsiVimScriptElement {
+  public PsiVimScriptElementImpl(@org.jetbrains.annotations.NotNull ASTNode node) {
     super(node);
   }
 

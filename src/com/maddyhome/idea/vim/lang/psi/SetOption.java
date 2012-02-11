@@ -9,7 +9,7 @@ import com.intellij.lang.ASTNode;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public class SetOption extends VimScriptPsiElementImpl {
+public class SetOption extends PsiVimScriptElementImpl {
   public SetOption(@org.jetbrains.annotations.NotNull ASTNode node) {
     super(node);
   }

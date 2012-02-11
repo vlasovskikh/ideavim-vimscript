@@ -8,5 +8,5 @@ import com.intellij.psi.PsiElement;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public interface VimScriptPsiElement extends PsiElement {
+public interface PsiVimScriptElement extends PsiElement {
 }

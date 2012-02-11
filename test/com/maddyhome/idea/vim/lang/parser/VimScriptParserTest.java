@@ -1,12 +1,24 @@
 package com.maddyhome.idea.vim.lang.parser;
 
+import com.intellij.debugger.engine.DebuggerUtils;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.PsiParser;
 import com.intellij.lang.impl.PsiBuilderImpl;
 import com.intellij.lexer.Lexer;
+import com.intellij.mock.MockProject;
+import com.intellij.mock.MockPsiManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.impl.DebugUtil;
+import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.maddyhome.idea.vim.lang.lexer.VimScriptFlexLexer;
 import com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes;
+import com.maddyhome.idea.vim.lang.psi.PsiVimScriptFile;
 import org.junit.Test;
 
 /**
@@ -15,17 +27,15 @@ import org.junit.Test;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public class VimScriptParserTest {
+public class VimScriptParserTest  {
+  //java/java-tests/testData/psi/parser-full/expressionParsing
   @Test
   public void test() {
-    String text = "set d=\n";
-    final ParserDefinition parserDefinition = new VimScriptParserDefinition();
-    final Lexer lexer = new VimScriptFlexLexer();
-    final PsiBuilder builder = new PsiBuilderImpl(
-        lexer, VimScriptTokenTypes.whitespaces, VimScriptTokenTypes.comments, text
+    String text = "set d\n4";
+    //String rcText = FileUtil.loadFile(filename);
+    PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(
+      ProjectManager.getInstance().getDefaultProject()
     );
-    final ASTNode node = parserDefinition.createParser(null).parse(builder.getTokenType(), builder);
-
-    System.out.println(node.getElementType());
+    PsiFile testPsiFile = psiFileFactory.createFileFromText("test.vim", text);
   }
 }

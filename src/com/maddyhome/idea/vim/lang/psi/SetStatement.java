@@ -9,7 +9,7 @@ import com.intellij.lang.ASTNode;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public class SetStatement extends VimScriptPsiElementImpl {
+public class SetStatement extends PsiVimScriptElementImpl {
   public SetStatement(@org.jetbrains.annotations.NotNull ASTNode node) {
     super(node);
   }

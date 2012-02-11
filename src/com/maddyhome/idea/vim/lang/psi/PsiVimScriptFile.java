@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public class VimScriptPsiFile extends PsiFileBase implements PsiFile {
-  public VimScriptPsiFile(@NotNull FileViewProvider viewProvider) {
+public class PsiVimScriptFile extends PsiFileBase implements PsiFile {
+  public PsiVimScriptFile(@NotNull FileViewProvider viewProvider) {
     super(viewProvider, VimScriptFileType.VIM_SCRIPT_LANGUAGE);
   }
 

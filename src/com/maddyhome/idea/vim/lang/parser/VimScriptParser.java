@@ -100,12 +100,6 @@ public class VimScriptParser implements PsiParser {
 
   private boolean parseOptions() {
     do {
-//      if (builder.getTokenType() != null) {
-//        System.out.println(builder.getTokenType() + ": " + builder.getTokenText());
-//      } else {
-//        System.out.print("!");
-//      }
-
       if (atToken(IDENTIFIER, "all")) {
         PsiBuilder.Marker mark = builder.mark();
         advanceLexer();
@@ -229,8 +223,7 @@ public class VimScriptParser implements PsiParser {
   private boolean atToken(@NotNull IElementType elementType, IElementType ... elementTypes) {
     boolean result = elementType.equals(builder.getTokenType());
     for (IElementType et : elementTypes) {
-      //result |= et.equals(builder.getTokenType());
-      result = result | et.equals(builder.getTokenType());
+      result |= et.equals(builder.getTokenType());
     }
     return result;
   }

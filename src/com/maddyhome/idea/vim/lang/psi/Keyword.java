@@ -8,7 +8,7 @@ import com.intellij.lang.ASTNode;
  * @author Ksenia V. Mamich
  * @version 1.0
  */
-public class Keyword extends VimScriptPsiElementImpl {
+public class Keyword extends PsiVimScriptElementImpl {
   public Keyword(@org.jetbrains.annotations.NotNull ASTNode node) {
     super(node);
   }

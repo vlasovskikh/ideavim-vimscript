@@ -20,6 +20,7 @@ import com.intellij.mock.MockProject;
 import com.intellij.mock.MockPsiManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
@@ -679,7 +680,9 @@ public class Options {
    * @return True if no errors were found, false if there were any errors.
    */
   public boolean parseOptionLine(Editor editor, ExCommand cmd, boolean failOnBad) {
-    PsiFileFactory psiFileFactory = new PsiFileFactoryImpl(new MockPsiManager(new MockProject()));
+    PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(
+      ProjectManager.getInstance().getDefaultProject()
+    );
     PsiFile psiFile = psiFileFactory.createFileFromText("vimrc.vim", cmd.getCommand() + " " + cmd.getArgument());
 
     return Options.getInstance().getAndParseSetStatements(editor, psiFile, failOnBad);
@@ -704,7 +707,9 @@ public class Options {
 
       try {
         String rcText = FileUtil.loadFile(rc);
-        PsiFileFactory psiFileFactory = new PsiFileFactoryImpl(new MockPsiManager(new MockProject()));
+        PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(
+          ProjectManager.getInstance().getDefaultProject()
+        );
         PsiFile rcPsiFile = psiFileFactory.createFileFromText("vimrc.vim", rcText);
         Editor editor = null;
         getAndParseSetStatements(editor, rcPsiFile, false);
