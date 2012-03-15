@@ -725,6 +725,7 @@ public class Options {
    * Creates all the supported options.
    */
   private void createDefaultOptions() {
+    addOption(new ToggleOption("autoindent", "ai", true)); //by default in vim - false
     addOption(new ToggleOption("digraph", "dg", false));
     addOption(new ToggleOption("gdefault", "gd", false));
     addOption(new NumberOption("history", "hi", 20, 1, Integer.MAX_VALUE));

@@ -19,26 +19,16 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.mock.MockProject;
-import com.intellij.mock.MockPsiManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.option.Option;
 import com.maddyhome.idea.vim.option.Options;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
- *
+ * Handler for 'set' command.
  */
 public class SetHandler extends CommandHandler {
   public SetHandler() {
@@ -51,9 +41,7 @@ public class SetHandler extends CommandHandler {
       logger.debug("arg=" + arg);
     }
 
-
     return Options.getInstance().parseOptionLine(editor, cmd, true);
-    //return Options.getInstance().parseOptionLine(editor, cmd.getArgument(), true);
   }
 
   private static Logger logger = Logger.getInstance(SetHandler.class.getName());
