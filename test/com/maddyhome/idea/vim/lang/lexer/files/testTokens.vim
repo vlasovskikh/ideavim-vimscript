@@ -56,3 +56,4 @@ while
 ; "bad character
 ?
 !
+\r\t\n
