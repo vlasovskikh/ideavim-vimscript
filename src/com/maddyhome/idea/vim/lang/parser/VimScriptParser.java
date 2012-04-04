@@ -46,17 +46,17 @@ public class VimScriptParser implements PsiParser {
   private void parseBlock() {
     PsiBuilder.Marker block = builder.mark();
     skipWhitespaces();
+    final PsiBuilder.Marker mark = builder.mark();
     if (atToken(IDENTIFIER, "set") || atToken(IDENTIFIER, "se")) {
-      final PsiBuilder.Marker mark = builder.mark();
       if (!parseSetStmt(mark)) {
-        mark.drop();
-        builder.error("Could not parse set stmt");
+        advanceToNewLine();
+        mark.error("Could not parse set stmt");
       }
 
     }
     else {
-      builder.error("Set expression expected");
       advanceToNewLine();
+      mark.error("Set expression expected");
     }
     if (atToken(WHITESPACE)) {
       skipWhitespaces();
@@ -90,9 +90,8 @@ public class VimScriptParser implements PsiParser {
         return true;
       }
       else {
-        startMark.drop();
-        builder.error("Options list expected");
         advanceUntilNewLine();
+        startMark.error("Options list expected");
       }
     }
     return false;
@@ -115,15 +114,13 @@ public class VimScriptParser implements PsiParser {
             skipWhitespaces();
           }
           else {
-            mark.drop();
-            builder.error("'all&' option expected");
             advanceUntilNewLine();
+            mark.error("'all&' option expected");
           }
         }
         else {
-          mark.drop();
-          builder.error("'all' option expected");
           advanceUntilNewLine();
+          mark.error("'all' option expected");
         }
       }
       else if (atToken(IDENTIFIER, "termcap")) {
@@ -135,9 +132,8 @@ public class VimScriptParser implements PsiParser {
           skipWhitespaces();
         }
         else {
-          mark.drop();
-          builder.error("'termcap' option expected");
           advanceUntilNewLine();
+          mark.error("'termcap' option expected");
         }
       }
       else if (atToken(IDENTIFIER) && (startsWith("no") || startsWith("inv"))) {
@@ -148,9 +144,8 @@ public class VimScriptParser implements PsiParser {
           skipWhitespaces();
         }
         else {
-          mark.drop();
-          builder.error("'no{option}' or 'inv{option}' expected");
           advanceUntilNewLine();
+          mark.error("'no{option}' or 'inv{option}' expected");
         }
       }
       else if (atToken(IDENTIFIER)) {
@@ -164,9 +159,8 @@ public class VimScriptParser implements PsiParser {
             skipWhitespaces();
           }
           else {
-            mark.drop();
-            builder.error("{option}[? || ! || &] expected.");
             advanceUntilNewLine();
+            mark.error("{option}[? || ! || &] expected.");
           }
 
         }
@@ -187,20 +181,18 @@ public class VimScriptParser implements PsiParser {
                 mark.done(SET_OPTION);
                 skipWhitespaces();
               } else {
-                mark.drop();
-                builder.error("String expected");
+                advanceUntilNewLine();
+                mark.error("String expected");
               }
             }
             else {
-              mark.drop();
-              builder.error("Identifier expected");
               advanceUntilNewLine();
+              mark.error("Identifier expected");
             }
           }
           else {
-            mark.drop();
-            builder.error("Value or variable expected");
             advanceUntilNewLine();
+            mark.error("Value or variable expected");
           }
         }
         else if (whitespace()) {
@@ -208,13 +200,13 @@ public class VimScriptParser implements PsiParser {
           skipWhitespaces();
         }
         else {
-          mark.drop();
-          builder.error("Smth different expected");
+          mark.error("Smth different expected");
         }
       }
       else if (!atToken(IDENTIFIER) && !atToken(WHITESPACE) && !endl()) {
-        builder.error("Identifier expected");
+        PsiBuilder.Marker mark = builder.mark();
         advanceUntilNewLine();
+        mark.error("Identifier expected");
       }
     } while (!endl());
     return true;
