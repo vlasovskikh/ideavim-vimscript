@@ -1,8 +1,6 @@
 package com.maddyhome.idea.vim.lang.lexer;
 
 import com.intellij.lexer.FlexAdapter;
-import com.intellij.lexer.FlexLexer;
-import com.intellij.lexer.Lexer;
 
 import java.io.Reader;
 

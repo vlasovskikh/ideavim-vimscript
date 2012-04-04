@@ -22,6 +22,7 @@ import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
 
 InputChar = [^\r\n]
 SpaceChar = [\ \t]
+Space = {SpaceChar}{SpaceChar}*
 NewLineChar = \r|\n|\r\n
 
 UppercaseLetter = [A-Z]
@@ -115,7 +116,7 @@ Identifier = {Name}
 "\'"                        { return SINGLE_QUOTE; }
 "\""                        { return DOUBLE_QUOTE; }
 
-{SpaceChar}                 { return WHITESPACE; }
+{Space}                     { return WHITESPACE; }
 
 <<EOF>>                     { return null; }
 .                           { return BAD_CHARACTER; }
