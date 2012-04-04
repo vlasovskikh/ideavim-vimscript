@@ -20,10 +20,12 @@ import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
 %function advance
 %type IElementType
 
+Char = .
 InputChar = [^\r\n]
 SpaceChar = [\ \t]
 Space = {SpaceChar}{SpaceChar}*
 NewLineChar = \r|\n|\r\n
+EscapedChar = \\{Char}
 
 UppercaseLetter = [A-Z]
 Letter = [a-zA-Z]
@@ -54,6 +56,7 @@ Identifier = {Name}
 
 %%
 
+{EscapedChar}               { return ESCAPED_CHAR; }
 {NewLineChar}               { return NEW_LINE; }
 
 // operators

@@ -16,6 +16,7 @@ public interface VimScriptTokenTypes {
   public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
   public static final IElementType WHITESPACE = TokenType.WHITE_SPACE;
   public static final IElementType NEW_LINE = TokenType.NEW_LINE_INDENT;
+  public static final IElementType ESCAPED_CHAR = new VimScriptElementType("ESCAPED");
 
   public static final TokenSet whitespaces = TokenSet.create(
       //WHITESPACE
