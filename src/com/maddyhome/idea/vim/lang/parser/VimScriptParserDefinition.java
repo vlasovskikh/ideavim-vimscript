@@ -52,13 +52,13 @@ public class VimScriptParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public TokenSet getCommentTokens() {
-    return VimScriptTokenTypes.comments;
+    return VimScriptTokenTypes.comment;
   }
 
   @NotNull
   @Override
   public TokenSet getStringLiteralElements() {
-    return VimScriptTokenTypes.strings;
+    return VimScriptTokenTypes.string;
   }
 
   @NotNull

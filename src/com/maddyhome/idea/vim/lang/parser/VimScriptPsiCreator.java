@@ -26,6 +26,14 @@ public class VimScriptPsiCreator {
       return new Keyword(node);
     }
 
+    if (VimScriptElementTypes.VARIABLE.equals(node.getElementType())) {
+      return new Variable(node);
+    }
+
+    if (VimScriptElementTypes.LET_STMT.equals(node.getElementType())) {
+      return new LetStatement(node);
+    }
+
     if (VimScriptElementTypes.SET_STMT.equals(node.getElementType())) {
       return new SetStatement(node);
     }

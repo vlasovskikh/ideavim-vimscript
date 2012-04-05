@@ -17,13 +17,15 @@ public interface VimScriptElementTypes {
   public static final IElementType BLOCK = new VimScriptElementType("code block");
 
   public static final IElementType KEYWORD = new VimScriptElementType("keyword");
-
+  public static final IElementType VARIABLE = new VimScriptElementType("variable");
+  public static final IElementType VALUE = new VimScriptElementType("value");
   public static final IElementType EXPRESSION = new VimScriptElementType("expression");
   public static final IElementType ASSIGNMENT_STMT = new VimScriptElementType("assign_stmt");
 
-  public static final IElementType LET_VAR_EXPR = new VimScriptElementType("let {var} = {expr}");
+  /* let stmt's staff */
+  public static final IElementType LET_STMT = new VimScriptElementType("let {var} = {expr}");
 
-  /* set stmts */
+  /* set stmt's staff */
   public static final IElementType SET_STMT = new VimScriptElementType("set stmt");
   public static final IElementType SET_OPTION = new VimScriptElementType("option");
   public static final TokenSet set_stmt_operators = TokenSet.create(
