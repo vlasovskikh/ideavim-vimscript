@@ -41,7 +41,7 @@ public interface VimScriptTokenTypes {
   public static final IElementType OP_MULT_ASSIGN = new VimScriptElementType("*=");
   public static final IElementType OP_DIV_ASSIGN = new VimScriptElementType("/=");
   public static final IElementType OP_CIRCUMFLEX_ASSIGN = new VimScriptElementType("^=");
-  public static final TokenSet assignmentOperators = TokenSet.create(
+  public static final TokenSet assignmentOperator = TokenSet.create(
       OP_ASSIGN, OP_PLUS_ASSIGN, OP_MINUS_ASSIGN, OP_MULT_ASSIGN, OP_DIV_ASSIGN, OP_CIRCUMFLEX_ASSIGN
   );
 
@@ -50,7 +50,7 @@ public interface VimScriptTokenTypes {
   public static final IElementType OP_MULT = new VimScriptElementType("*");
   public static final IElementType OP_DIV = new VimScriptElementType("/");
   public static final IElementType OP_MOD = new VimScriptElementType("%");
-  public static final TokenSet operators = TokenSet.create(
+  public static final TokenSet operator = TokenSet.create(
       OP_PLUS, OP_MINUS, OP_MULT, OP_DIV, OP_MOD
   );
 
@@ -71,18 +71,19 @@ public interface VimScriptTokenTypes {
 
   /* separators */
   public static final IElementType COLON = new VimScriptElementType(":");
+  public static final IElementType SEMICOLON = new VimScriptElementType(";");
   public static final IElementType COMMA = new VimScriptElementType(",");
   public static final IElementType DOT = new VimScriptElementType(".");
   public static final IElementType QUESTION_MARK = new VimScriptElementType("?");
   public static final IElementType EXCLAMATION_MARK = new VimScriptElementType("!");
 
-  /* identifiers */
+  /* identifier */
   public static final IElementType ENVIRONMENT_VARIABLE = new VimScriptElementType("envvar");
   public static final IElementType OPTION = new VimScriptElementType("option");
   public static final IElementType REGISTER = new VimScriptElementType("register");
   public static final IElementType VARIABLE_WITH_PREFIX = new VimScriptElementType("prefix:varname");
   public static final IElementType IDENTIFIER = new VimScriptElementType("identifier");
-  public static final TokenSet identifiers = TokenSet.create(
+  public static final TokenSet identifier = TokenSet.create(
       ENVIRONMENT_VARIABLE, OPTION, REGISTER, VARIABLE_WITH_PREFIX, IDENTIFIER
   );
 
@@ -95,13 +96,13 @@ public interface VimScriptTokenTypes {
 
   /* string */
   public static final IElementType STRING = new VimScriptElementType("string");
-  public static final TokenSet strings = TokenSet.create(
+  public static final TokenSet string = TokenSet.create(
       STRING
   );
 
   /* comment */
   public static final IElementType COMMENT = new VimScriptElementType("comment");
-  public static final TokenSet comments = TokenSet.create(
+  public static final TokenSet comment = TokenSet.create(
       COMMENT
   );
 }

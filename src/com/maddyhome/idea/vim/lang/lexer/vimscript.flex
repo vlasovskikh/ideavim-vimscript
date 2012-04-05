@@ -110,6 +110,7 @@ Identifier = {Name}
 // separators
 "&"                         { return AMPERSAND; }
 ":"                         { return COLON; }
+";"                         { return SEMICOLON; }
 "."                         { return DOT; }
 ","                         { return COMMA; }
 "?"                         { return QUESTION_MARK; }
