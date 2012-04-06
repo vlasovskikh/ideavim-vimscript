@@ -1,0 +1,5 @@
+VimScriptFile
+  Block(code block)
+    SetStatement(set stmt)
+      Keyword(keyword)
+        PsiElement(identifier)('set')
