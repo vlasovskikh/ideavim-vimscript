@@ -83,6 +83,14 @@ public class VimScriptLexerTest extends LexerTestCase {
     );
   }
 
+  public void testSpecialCharacters() {
+    doTest(
+      "\\r\\n",
+      "ESCAPED ('\\r')\n" +
+        "ESCAPED ('\\n')"
+    );
+  }
+
   public void testSymbols() {
     doTest(
       ": . ; ? ! &",
