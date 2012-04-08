@@ -41,8 +41,10 @@ public interface VimScriptTokenTypes {
   public static final IElementType OP_MULT_ASSIGN = new VimScriptElementType("*=");
   public static final IElementType OP_DIV_ASSIGN = new VimScriptElementType("/=");
   public static final IElementType OP_CIRCUMFLEX_ASSIGN = new VimScriptElementType("^=");
+  public static final IElementType OP_DOT_ASSIGN = new VimScriptElementType(".=");
   public static final TokenSet assignmentOperator = TokenSet.create(
-      OP_ASSIGN, OP_PLUS_ASSIGN, OP_MINUS_ASSIGN, OP_MULT_ASSIGN, OP_DIV_ASSIGN, OP_CIRCUMFLEX_ASSIGN
+      OP_ASSIGN, OP_PLUS_ASSIGN, OP_MINUS_ASSIGN, OP_MULT_ASSIGN, OP_DIV_ASSIGN,
+    OP_CIRCUMFLEX_ASSIGN, OP_DOT_ASSIGN
   );
 
   public static final IElementType OP_PLUS = new VimScriptElementType("+");

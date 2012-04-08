@@ -249,7 +249,7 @@ public class VimScriptParser implements PsiParser {
         advanceToNewLineCharacter();
         return true;
 
-      }
+      } /*
       else if (atToken(assignmentOperator)) {
         advanceLexerSkippingWhitespaces();
 
@@ -275,11 +275,47 @@ public class VimScriptParser implements PsiParser {
       else {
         advanceToNewLineCharacter();
         startMark.error("End of line or assignment stmt expected.");
-      }
+      }*/
     }
     else {
       advanceToNewLineCharacter();
-      startMark.error("Endl expected");//"Variable expected.");
+      startMark.error("Variable expected.");
+    }
+    return false;
+  }
+
+  private boolean parseAssignmentStatement(PsiBuilder.Marker startMarker) {
+    if (atToken(ENVIRONMENT_VARIABLE, REGISTER)) {
+      PsiBuilder.Marker var = builder.mark();
+      advanceLexer();
+      var.done(VARIABLE);
+      skipWhitespaces();
+
+      if (atToken(OP_ASSIGN, OP_DOT_ASSIGN)) {
+        advanceLexerSkippingWhitespaces();
+
+        // Here should be expression
+      }
+      else {
+        advanceToNewLineCharacter();
+        startMarker.error("Assign operation for $env or @reg expected.");
+      }
+    }
+    else if (atToken(IDENTIFIER, OPTION)) {
+      if (atToken(OP_ASSIGN, OP_DOT_ASSIGN, OP_MINUS_ASSIGN, OP_PLUS_ASSIGN)) {
+        advanceLexerSkippingWhitespaces();
+
+        // Here should be expression
+      }
+      else {
+        advanceToNewLineCharacter();
+        startMarker.error("Assign operator for variable or &option expected.");
+      }
+    }
+    // Here should be array assignments
+    else {
+      advanceToNewLineCharacter();
+      startMarker.error("Could not parse assignment statement.");
     }
     return false;
   }
