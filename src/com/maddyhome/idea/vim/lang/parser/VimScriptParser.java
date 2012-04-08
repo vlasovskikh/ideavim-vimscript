@@ -32,9 +32,11 @@ public class VimScriptParser implements PsiParser {
     }
     else {
       while (!builder.eof()) {
-        parseBlock();
         if (atToken(NEW_LINE)) {
-          advanceToNewLine();
+          advanceToFirstTokenOfNewLine();
+        }
+        else {
+          parseBlock();
         }
       }
     }
@@ -49,14 +51,20 @@ public class VimScriptParser implements PsiParser {
     final PsiBuilder.Marker mark = builder.mark();
     if (atToken(IDENTIFIER, "set") || atToken(IDENTIFIER, "se")) {
       if (!parseSetStmt(mark)) {
-        advanceToNewLine();
+        advanceToNewLineCharacter();
         mark.error("Could not parse set stmt");
       }
 
     }
+    else if (atToken(IDENTIFIER, "let")) {
+      if (!parseLetStatement(mark)) {
+        advanceToNewLineCharacter();
+        mark.error("Could not parse let statement");
+      }
+    }
     else {
-      advanceToNewLine();
-      mark.error("Set expression expected");
+      advanceToNewLineCharacter();
+      mark.error("Set or let expression expected");
     }
     if (atToken(WHITESPACE)) {
       skipWhitespaces();
@@ -76,10 +84,11 @@ public class VimScriptParser implements PsiParser {
     PsiBuilder.Marker keyword = builder.mark();
     advanceLexer();
     keyword.done(KEYWORD);
-    advanceLexerSkippingWhitespaces();
+    skipWhitespaces();
 
     if (endl()) {
       startMark.done(SET_STMT);
+      advanceToNewLineCharacter();
       return true;
 
     }
@@ -90,7 +99,7 @@ public class VimScriptParser implements PsiParser {
         return true;
       }
       else {
-        advanceUntilNewLine();
+        advanceToNewLineCharacter();
         startMark.error("Options list expected");
       }
     }
@@ -114,12 +123,12 @@ public class VimScriptParser implements PsiParser {
             skipWhitespaces();
           }
           else {
-            advanceUntilNewLine();
+            advanceToNewLineCharacter();
             mark.error("'all&' option expected");
           }
         }
         else {
-          advanceUntilNewLine();
+          advanceToNewLineCharacter();
           mark.error("'all' option expected");
         }
       }
@@ -132,7 +141,7 @@ public class VimScriptParser implements PsiParser {
           skipWhitespaces();
         }
         else {
-          advanceUntilNewLine();
+          advanceToNewLineCharacter();
           mark.error("'termcap' option expected");
         }
       }
@@ -144,7 +153,7 @@ public class VimScriptParser implements PsiParser {
           skipWhitespaces();
         }
         else {
-          advanceUntilNewLine();
+          advanceToNewLineCharacter();
           mark.error("'no{option}' or 'inv{option}' expected");
         }
       }
@@ -159,7 +168,7 @@ public class VimScriptParser implements PsiParser {
             skipWhitespaces();
           }
           else {
-            advanceUntilNewLine();
+            advanceToNewLineCharacter();
             mark.error("{option}[? || ! || &] expected.");
           }
 
@@ -167,7 +176,7 @@ public class VimScriptParser implements PsiParser {
         else if (atToken(OP_ASSIGN) || atToken(COLON) || atToken(OP_PLUS_ASSIGN) ||
             atToken(OP_CIRCUMFLEX_ASSIGN) || atToken(OP_MINUS_ASSIGN)) {
           advanceLexer();
-          if (atToken(identifiers) || atToken(number)) {
+          if (atToken(identifier) || atToken(number)) {
             advanceLexer();
             if (whitespace()) {
               mark.done(SET_OPTION);
@@ -181,17 +190,17 @@ public class VimScriptParser implements PsiParser {
                 mark.done(SET_OPTION);
                 skipWhitespaces();
               } else {
-                advanceUntilNewLine();
+                advanceToNewLineCharacter();
                 mark.error("String expected");
               }
             }
             else {
-              advanceUntilNewLine();
+              advanceToNewLineCharacter();
               mark.error("Identifier expected");
             }
           }
           else {
-            advanceUntilNewLine();
+            advanceToNewLineCharacter();
             mark.error("Value or variable expected");
           }
         }
@@ -205,11 +214,74 @@ public class VimScriptParser implements PsiParser {
       }
       else if (!atToken(IDENTIFIER) && !atToken(WHITESPACE) && !endl()) {
         PsiBuilder.Marker mark = builder.mark();
-        advanceUntilNewLine();
+        advanceToNewLineCharacter();
         mark.error("Identifier expected");
       }
     } while (!endl());
     return true;
+  }
+
+  /**
+   * Parses 'let' statement.
+   * @param startMark marks the position before 'let' keyword.
+   * @return true if parsed successful, false otherwise.
+   */
+  private boolean parseLetStatement(PsiBuilder.Marker startMark) {
+    PsiBuilder.Marker keyword = builder.mark();
+    advanceLexer();
+    keyword.done(KEYWORD);
+    skipWhitespaces();
+
+    if (endl()) {
+      startMark.done(LET_STMT);
+      advanceToNewLineCharacter();
+      return true;
+
+    }
+    else if (atToken(identifier)) {
+      PsiBuilder.Marker var = builder.mark();
+      advanceLexer();
+      var.done(VARIABLE);
+      skipWhitespaces();
+
+      if (endl()) {
+        startMark.done(LET_STMT);
+        advanceToNewLineCharacter();
+        return true;
+
+      }
+      else if (atToken(assignmentOperator)) {
+        advanceLexerSkippingWhitespaces();
+
+        if (atToken(identifier)) {
+          PsiBuilder.Marker variable = builder.mark();
+          advanceLexer();
+          variable.done(VARIABLE);
+          startMark.done(LET_STMT);
+          return true;
+        }
+        else if (atToken(number) || atToken(string)) {
+          PsiBuilder.Marker value = builder.mark();
+          advanceLexer();
+          value.done(VALUE);
+          startMark.done(LET_STMT);
+          return true;
+        }
+        else {
+          advanceToNewLineCharacter();
+          startMark.error("Value or variable expected.");
+        }
+      }
+      else {
+        advanceToNewLineCharacter();
+        startMark.error("End of line or assignment stmt expected.");
+      }
+    }
+    else {
+      advanceToNewLineCharacter();
+      startMark.error("Endl expected");//"Variable expected.");
+    }
+    return false;
   }
 
   private boolean atToken(@NotNull IElementType elementType, IElementType ... elementTypes) {
@@ -240,20 +312,15 @@ public class VimScriptParser implements PsiParser {
   private boolean endl() {
     PsiBuilder.Marker marker = builder.mark();
     if (atToken(WHITESPACE)) {
-      advanceLexerSkippingWhitespaces();
+      skipWhitespaces();
     }
+    boolean isEndl = NEW_LINE.equals(builder.getTokenType()) || builder.eof();
     marker.rollbackTo();
-    return NEW_LINE.equals(builder.getTokenType()) || builder.eof();
+    return isEndl;
   }
 
   private void advanceLexer() {
     builder.advanceLexer();
-  }
-
-  private void advanceToWhitespace() {
-    while (!atToken(WHITESPACE) && !builder.eof()) {
-      advanceLexer();
-    }
   }
 
   private void advanceLexerSkippingWhitespaces() {
@@ -262,16 +329,14 @@ public class VimScriptParser implements PsiParser {
     } while (atToken(WHITESPACE) && !builder.eof());
   }
 
-  private void advanceUntilNewLine() {
-    do {
-      advanceLexer();
-    } while (!atToken(NEW_LINE) && !builder.eof());
-  }
-
-  private void advanceToNewLine() {
+  private void advanceToNewLineCharacter() {
     while (!atToken(NEW_LINE) && !builder.eof()) {
       advanceLexer();
     }
+  }
+
+  private void advanceToFirstTokenOfNewLine() {
+    advanceToNewLineCharacter();
     advanceLexer();
   }
 
