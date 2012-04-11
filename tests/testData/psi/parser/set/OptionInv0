@@ -1,0 +1,8 @@
+VimScriptFile
+  Block(code block)
+    SetStatement(set stmt)
+      Keyword(keyword)
+        PsiElement(identifier)('set')
+      PsiWhiteSpace(' ')
+      SetOption(option)
+        PsiElement(identifier)('invopt')

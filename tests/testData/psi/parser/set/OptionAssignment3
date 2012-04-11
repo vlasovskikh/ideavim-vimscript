@@ -1,0 +1,12 @@
+VimScriptFile
+  Block(code block)
+    SetStatement(set stmt)
+      Keyword(keyword)
+        PsiElement(identifier)('set')
+      PsiWhiteSpace(' ')
+      SetOption(option)
+        PsiElement(identifier)('opt')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:Identifier expected
+        PsiElement(=)('=')
+        PsiElement(int)('3')
