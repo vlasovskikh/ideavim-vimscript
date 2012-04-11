@@ -12,4 +12,5 @@ public class CommonParsingTestCase extends VimScriptParsingTestCase {
   }
 
   public void testEmpty() { doParserTest(""); }
+  public void testNewline() { doParserTest("\n"); }
 }
