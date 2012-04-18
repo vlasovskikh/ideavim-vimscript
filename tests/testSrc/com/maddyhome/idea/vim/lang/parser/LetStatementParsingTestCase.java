@@ -16,7 +16,7 @@ public class LetStatementParsingTestCase extends VimScriptParsingTestCase {
 
   //public void testLetError0() { doParserTest("let var="); }
 
-  public void testLetVar0() { doParserTest("let var"); }
+  //public void testLetVar0() { doParserTest("let var"); }
 
 
 }

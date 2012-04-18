@@ -320,6 +320,14 @@ public class VimScriptParser implements PsiParser {
     return false;
   }
 
+  private boolean parseExpression(PsiBuilder.Marker startMarker) {
+    return false;
+  }
+
+  private boolean parseValue(PsiBuilder.Marker startMarkerMarker) {
+    return false;
+  }
+
   private boolean atToken(@NotNull IElementType elementType, IElementType ... elementTypes) {
     boolean result = elementType.equals(builder.getTokenType());
     for (IElementType et : elementTypes) {
