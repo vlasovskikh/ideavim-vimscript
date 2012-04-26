@@ -239,43 +239,28 @@ public class VimScriptParser implements PsiParser {
 
     }
     else if (atToken(identifier)) {
-      PsiBuilder.Marker var = builder.mark();
+      PsiBuilder.Marker mark = builder.mark();
       advanceLexer();
-      var.done(VARIABLE);
-      skipWhitespaces();
 
       if (endl()) {
+        mark.done(VARIABLE);
+        skipWhitespaces();
         startMark.done(LET_STMT);
         advanceToNewLineCharacter();
         return true;
 
-      } /*
+      }
       else if (atToken(assignmentOperator)) {
         advanceLexerSkippingWhitespaces();
-
-        if (atToken(identifier)) {
-          PsiBuilder.Marker variable = builder.mark();
-          advanceLexer();
-          variable.done(VARIABLE);
-          startMark.done(LET_STMT);
-          return true;
-        }
-        else if (atToken(number) || atToken(string)) {
-          PsiBuilder.Marker value = builder.mark();
-          advanceLexer();
-          value.done(VALUE);
-          startMark.done(LET_STMT);
-          return true;
-        }
-        else {
+        if (!parseAssignmentStatement(mark)) {
           advanceToNewLineCharacter();
-          startMark.error("Value or variable expected.");
+          startMark.error("Error parsing assignment statement.");
         }
       }
       else {
         advanceToNewLineCharacter();
         startMark.error("End of line or assignment stmt expected.");
-      }*/
+      }
     }
     else {
       advanceToNewLineCharacter();
@@ -323,17 +308,29 @@ public class VimScriptParser implements PsiParser {
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
     return false;
   }
-
-  private boolean parseValue(PsiBuilder.Marker startMarkerMarker) {
+  
+  private boolean atToken(@NotNull TokenSet tokenSet, TokenSet ... tokenSets) {
+    if (tokenSet.contains(builder.getTokenType())) {
+      return true;
+    }
+    for (TokenSet ts : tokenSets) {
+      if (ts.contains(builder.getTokenType())) {
+        return true;
+      }
+    }
     return false;
   }
 
   private boolean atToken(@NotNull IElementType elementType, IElementType ... elementTypes) {
-    boolean result = elementType.equals(builder.getTokenType());
-    for (IElementType et : elementTypes) {
-      result |= et.equals(builder.getTokenType());
+    if (elementType.equals(builder.getTokenType())) {
+      return true;
     }
-    return result;
+    for (IElementType et : elementTypes) {
+      if (et.equals(builder.getTokenType())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private boolean atToken(@NotNull TokenSet tokenSet) {
