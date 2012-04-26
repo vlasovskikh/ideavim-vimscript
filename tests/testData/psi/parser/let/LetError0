@@ -1,0 +1,9 @@
+VimScriptFile
+  Block(code block)
+    PsiErrorElement:Error parsing assignment statement.
+      Keyword(keyword)
+        PsiElement(identifier)('let')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:Could not parse assignment statement.
+        PsiElement(identifier)('var')
+        PsiElement(=)('=')

@@ -266,10 +266,11 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMark.error("Variable expected.");
     }
-    return false;
+    return true;
   }
 
   private boolean parseAssignmentStatement(PsiBuilder.Marker startMarker) {
+    System.out.println("Let: " + builder.getTokenType());
     if (atToken(ENVIRONMENT_VARIABLE, REGISTER)) {
       PsiBuilder.Marker var = builder.mark();
       advanceLexer();
@@ -279,7 +280,7 @@ public class VimScriptParser implements PsiParser {
       if (atToken(OP_ASSIGN, OP_DOT_ASSIGN)) {
         advanceLexerSkippingWhitespaces();
 
-        // Here should be expression
+        parseExpression(builder.mark());
       }
       else {
         advanceToNewLineCharacter();
@@ -290,7 +291,7 @@ public class VimScriptParser implements PsiParser {
       if (atToken(OP_ASSIGN, OP_DOT_ASSIGN, OP_MINUS_ASSIGN, OP_PLUS_ASSIGN)) {
         advanceLexerSkippingWhitespaces();
 
-        // Here should be expression
+        parseExpression(builder.mark());
       }
       else {
         advanceToNewLineCharacter();
@@ -302,7 +303,7 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMarker.error("Could not parse assignment statement.");
     }
-    return false;
+    return true;
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
