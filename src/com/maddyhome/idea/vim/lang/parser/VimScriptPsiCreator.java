@@ -1,10 +1,9 @@
 package com.maddyhome.idea.vim.lang.parser;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 
-import com.maddyhome.idea.vim.lang.lexer.VimScriptElementType;
+import com.intellij.psi.tree.IElementType;
 import com.maddyhome.idea.vim.lang.psi.*;
 
 /**
@@ -18,30 +17,40 @@ public class VimScriptPsiCreator {
 
     //return node.getPsi();
 
-    if (VimScriptElementTypes.SET_OPTION.equals(node.getElementType())) {
+    IElementType elementType = node.getElementType();
+
+    if (VimScriptElementTypes.SET_OPTION.equals(elementType)) {
       return new SetOption(node);
     }
 
-    if (VimScriptElementTypes.KEYWORD.equals(node.getElementType())) {
+    if (VimScriptElementTypes.KEYWORD.equals(elementType)) {
       return new Keyword(node);
     }
 
-    if (VimScriptElementTypes.VARIABLE.equals(node.getElementType())) {
+    if (VimScriptElementTypes.VARIABLE.equals(elementType)) {
       return new Variable(node);
     }
 
-    if (VimScriptElementTypes.LET_STMT.equals(node.getElementType())) {
+    if (VimScriptElementTypes.EXPRESSION.equals(elementType)) {
+      return new Expression(node);
+    }
+
+    if (VimScriptElementTypes.LET_STMT.equals(elementType)) {
       return new LetStatement(node);
     }
 
-    if (VimScriptElementTypes.SET_STMT.equals(node.getElementType())) {
+    if (VimScriptElementTypes.SET_STMT.equals(elementType)) {
       return new SetStatement(node);
     }
 
-    if (VimScriptElementTypes.BLOCK.equals(node.getElementType())) {
-      return new Block(node);
+    if (VimScriptElementTypes.FUNCTION_DEFINITION.equals(elementType)) {
+      return new FunctionDefinition(node);
     }
 
-    return new PsiVimScriptTokenImpl(node.getElementType(), node.getText());
+    if (VimScriptElementTypes.FUNCTION_BODY.equals(elementType)) {
+      return new FunctionBody(node);
+    }
+
+    return new PsiVimScriptTokenImpl(elementType, node.getText());
   }
 }

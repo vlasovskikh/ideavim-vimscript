@@ -14,19 +14,23 @@ import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
  */
 public interface VimScriptElementTypes {
   public static final IElementType EMPTY_INPUT = new VimScriptElementType("empty input");
-  public static final IElementType BLOCK = new VimScriptElementType("code block");
+
+  /* function */
+  public static final IElementType FUNCTION_DEFINITION = new VimScriptElementType("function definition");
+  public static final IElementType FUNCTION_BODY = new VimScriptElementType("function body");
+
 
   public static final IElementType KEYWORD = new VimScriptElementType("keyword");
   public static final IElementType VARIABLE = new VimScriptElementType("variable");
   public static final IElementType VALUE = new VimScriptElementType("value");
   public static final IElementType EXPRESSION = new VimScriptElementType("expression");
-  public static final IElementType ASSIGNMENT_STMT = new VimScriptElementType("assign_stmt");
+  public static final IElementType ASSIGNMENT_STMT = new VimScriptElementType("assignment statement");
 
   /* let stmt's staff */
-  public static final IElementType LET_STMT = new VimScriptElementType("let {var} = {expr}");
+  public static final IElementType LET_STMT = new VimScriptElementType("let statement");
 
   /* set stmt's staff */
-  public static final IElementType SET_STMT = new VimScriptElementType("set stmt");
+  public static final IElementType SET_STMT = new VimScriptElementType("set statement");
   public static final IElementType SET_OPTION = new VimScriptElementType("option");
   public static final TokenSet set_stmt_operators = TokenSet.create(
       OP_ASSIGN, COLON, OP_PLUS_ASSIGN, OP_CIRCUMFLEX_ASSIGN, OP_MINUS_ASSIGN
