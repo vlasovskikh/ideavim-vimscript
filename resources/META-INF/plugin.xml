@@ -24,7 +24,10 @@
     <vendor logo="/icons/vim16x16.png">Rick Maddy, JetBrains</vendor>
 
     <helpset file="help.jar" path="/VimHelp.hs"/>
-    <idea-version since-build="@SINCE-VERSION@"/>
+    <!--Does not work with line below because of @SINCE-VERSION@.-->
+    <!--ERROR - com.intellij.ide.plugins.PluginManager - Unparsable version number: @SINCE-VERSION@-->
+    <!--<idea-version since-build="@SINCE-VERSION@"/>-->
+    <idea-version since-build="1.0"/>
 
     <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
     <depends>com.intellij.modules.lang</depends>
