@@ -221,17 +221,27 @@ public class VimScriptParser implements PsiParser {
     else if (atToken(identifier)) {
       PsiBuilder.Marker mark = builder.mark();
       advanceLexer();
+      mark.done(VARIABLE);
 
       if (endl()) {
-        mark.done(VARIABLE);
         skipWhitespaces();
         startMark.done(LET_STMT);
         advanceToNewLineCharacter();
 
       }
       else {
-        advanceLexerSkippingWhitespaces();
-        parseAssignmentStatement(mark);
+        advanceLexer();
+        if (atToken(identifier)) {
+          while (!endl()) {
+            mark = builder.mark();
+            advanceLexer();
+            mark.done(VARIABLE);
+            skipWhitespaces();
+          }
+        }
+        else {
+          parseAssignmentStatement(mark.precede());
+        }
         startMark.done(LET_STMT);
         advanceToNewLineCharacter();
 
@@ -257,9 +267,10 @@ public class VimScriptParser implements PsiParser {
 
       if (atToken(OP_ASSIGN, OP_DOT_ASSIGN)) {
         advanceLexerSkippingWhitespaces();
-
-        //parseExpression(builder.mark());
+        parseExpression(builder.mark());
         startMark.done(ASSIGNMENT_STMT);
+        advanceToNewLineCharacter();
+
       }
       else {
         advanceToNewLineCharacter();
@@ -275,9 +286,9 @@ public class VimScriptParser implements PsiParser {
 
       if (atToken(OP_ASSIGN, OP_DOT_ASSIGN, OP_MINUS_ASSIGN, OP_PLUS_ASSIGN)) {
         advanceLexerSkippingWhitespaces();
-
-        //parseExpression(builder.mark());
+        parseExpression(builder.mark());
         startMark.done(ASSIGNMENT_STMT);
+        advanceToNewLineCharacter();
       }
       else {
         advanceToNewLineCharacter();
