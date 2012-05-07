@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../build/IdeaVim.jar!/" />
+          <root url="jar://$MODULE_DIR$/../ideavim.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

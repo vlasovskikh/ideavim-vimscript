@@ -43,7 +43,7 @@ public class VimScriptLexerTest extends LexerTestCase {
 
   public void testOperators() {
     doTest(
-      "== != >= > <= < =~ !~ || && + - * / % =",
+      "== != >= > <= < =~ !~ || && += -= *= /= ^= .= + - * / % =",
       "== ('==')\nWHITE_SPACE (' ')\n" +
         "!= ('!=')\nWHITE_SPACE (' ')\n" +
         ">= ('>=')\nWHITE_SPACE (' ')\n" +
@@ -54,6 +54,12 @@ public class VimScriptLexerTest extends LexerTestCase {
         "!~ ('!~')\nWHITE_SPACE (' ')\n" +
         "|| ('||')\nWHITE_SPACE (' ')\n" +
         "&& ('&&')\nWHITE_SPACE (' ')\n" +
+        "+= ('+=')\nWHITE_SPACE (' ')\n" +
+        "-= ('-=')\nWHITE_SPACE (' ')\n" +
+        "*= ('*=')\nWHITE_SPACE (' ')\n" +
+        "/= ('/=')\nWHITE_SPACE (' ')\n" +
+        "^= ('^=')\nWHITE_SPACE (' ')\n" +
+        ".= ('.=')\nWHITE_SPACE (' ')\n" +
         "+ ('+')\nWHITE_SPACE (' ')\n" +
         "- ('-')\nWHITE_SPACE (' ')\n" +
         "* ('*')\nWHITE_SPACE (' ')\n" +

@@ -78,6 +78,7 @@ Identifier = {Name}
 "*="                        { return OP_MULT_ASSIGN; }
 "/="                        { return OP_DIV_ASSIGN; }
 "^="                        { return OP_CIRCUMFLEX_ASSIGN; }
+".="                        { return OP_DOT_ASSIGN; }
 "="                         { return OP_ASSIGN; }
 
 //unary operators
