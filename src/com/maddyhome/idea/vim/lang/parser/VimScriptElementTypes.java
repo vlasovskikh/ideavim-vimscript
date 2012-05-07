@@ -13,7 +13,7 @@ import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
  * @version 1.0
  */
 public interface VimScriptElementTypes {
-  public static final IElementType EMPTY_INPUT = new VimScriptElementType("empty input");
+  public static final IElementType EMPTY = new VimScriptElementType("empty");
 
   /* function */
   public static final IElementType FUNCTION_DEFINITION = new VimScriptElementType("function definition");

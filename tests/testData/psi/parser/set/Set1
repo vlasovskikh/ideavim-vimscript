@@ -1,5 +1,4 @@
 VimScriptFile
-  Block(code block)
-    SetStatement(set stmt)
-      Keyword(keyword)
-        PsiElement(identifier)('se')
+  SetStatement(set statement)
+    Keyword(keyword)
+      PsiElement(identifier)('se')

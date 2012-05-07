@@ -22,13 +22,13 @@ public class VimScriptParser implements PsiParser {
   @NotNull
   @Override
   public ASTNode parse(IElementType root, PsiBuilder psiBuilder) {
-    this.builder = psiBuilder;//new VimScriptPsiBuilder(psiBuilder);
+    this.builder = psiBuilder; //new VimScriptPsiBuilder(psiBuilder);
     this.builder.setDebugMode(true);
     final PsiBuilder.Marker rootMark = builder.mark();
 
     if (builder.eof()) {
       final PsiBuilder.Marker marker = builder.mark();
-      marker.done(EMPTY_INPUT);
+      marker.done(EMPTY);
     }
     else {
       while (!builder.eof()) {
@@ -36,7 +36,7 @@ public class VimScriptParser implements PsiParser {
           advanceToFirstTokenOfNewLine();
         }
         else {
-          parseBlock();
+          parseStatement();
         }
       }
     }
@@ -45,22 +45,15 @@ public class VimScriptParser implements PsiParser {
     return builder.getTreeBuilt();
   }
 
-  private void parseBlock() {
-    PsiBuilder.Marker block = builder.mark();
+  private void parseStatement() {
     skipWhitespaces();
     final PsiBuilder.Marker mark = builder.mark();
     if (atToken(IDENTIFIER, "set") || atToken(IDENTIFIER, "se")) {
-      if (!parseSetStmt(mark)) {
-        advanceToNewLineCharacter();
-        mark.error("Could not parse set stmt");
-      }
+      parseSetStatement(mark);
 
     }
     else if (atToken(IDENTIFIER, "let")) {
-      if (!parseLetStatement(mark)) {
-        advanceToNewLineCharacter();
-        mark.error("Could not parse let statement");
-      }
+      parseLetStatement(mark);
     }
     else {
       advanceToNewLineCharacter();
@@ -69,7 +62,6 @@ public class VimScriptParser implements PsiParser {
     if (atToken(WHITESPACE)) {
       skipWhitespaces();
     }
-    block.done(BLOCK);
     if (atToken(NEW_LINE)) {
       advanceLexer();
     }
@@ -78,9 +70,8 @@ public class VimScriptParser implements PsiParser {
   /**
    * Parses 'set' statements.
    * @param startMark marks the position before 'set' keyword.
-   * @return true if parsed successful, false otherwise.
    */
-  private boolean parseSetStmt(PsiBuilder.Marker startMark) {
+  private void parseSetStatement(PsiBuilder.Marker startMark) {
     PsiBuilder.Marker keyword = builder.mark();
     advanceLexer();
     keyword.done(KEYWORD);
@@ -89,24 +80,15 @@ public class VimScriptParser implements PsiParser {
     if (endl()) {
       startMark.done(SET_STMT);
       advanceToNewLineCharacter();
-      return true;
-
     }
     else {
-      if (parseOptions()) {
-        startMark.done(SET_STMT);
-        advanceLexer();
-        return true;
-      }
-      else {
-        advanceToNewLineCharacter();
-        startMark.error("Options list expected");
-      }
+      parseSetOptions();
+      startMark.done(SET_STMT);
+      advanceLexer();
     }
-    return false;
   }
 
-  private boolean parseOptions() {
+  private void parseSetOptions() {
     do {
       if (atToken(IDENTIFIER, "all")) {
         PsiBuilder.Marker mark = builder.mark();
@@ -218,7 +200,6 @@ public class VimScriptParser implements PsiParser {
         mark.error("Identifier expected");
       }
     } while (!endl());
-    return true;
   }
 
   /**
@@ -226,7 +207,7 @@ public class VimScriptParser implements PsiParser {
    * @param startMark marks the position before 'let' keyword.
    * @return true if parsed successful, false otherwise.
    */
-  private boolean parseLetStatement(PsiBuilder.Marker startMark) {
+  private void parseLetStatement(PsiBuilder.Marker startMark) {
     PsiBuilder.Marker keyword = builder.mark();
     advanceLexer();
     keyword.done(KEYWORD);
@@ -235,7 +216,6 @@ public class VimScriptParser implements PsiParser {
     if (endl()) {
       startMark.done(LET_STMT);
       advanceToNewLineCharacter();
-      return true;
 
     }
     else if (atToken(identifier)) {
@@ -247,30 +227,28 @@ public class VimScriptParser implements PsiParser {
         skipWhitespaces();
         startMark.done(LET_STMT);
         advanceToNewLineCharacter();
-        return true;
 
       }
-      else if (atToken(assignmentOperator)) {
-        advanceLexerSkippingWhitespaces();
-        if (!parseAssignmentStatement(mark)) {
-          advanceToNewLineCharacter();
-          startMark.error("Error parsing assignment statement.");
-        }
-      }
       else {
+        advanceLexerSkippingWhitespaces();
+        parseAssignmentStatement(mark);
+        startMark.done(LET_STMT);
         advanceToNewLineCharacter();
-        startMark.error("End of line or assignment stmt expected.");
+
       }
     }
     else {
       advanceToNewLineCharacter();
       startMark.error("Variable expected.");
     }
-    return true;
   }
 
-  private boolean parseAssignmentStatement(PsiBuilder.Marker startMarker) {
-    System.out.println("Let: " + builder.getTokenType());
+  /**
+   * Parses assignment statement.
+   * @param startMark marks the position before start of assignment statement.
+   * @return true if passed successfule, false otherwise.
+   */
+  private boolean parseAssignmentStatement(PsiBuilder.Marker startMark) {
     if (atToken(ENVIRONMENT_VARIABLE, REGISTER)) {
       PsiBuilder.Marker var = builder.mark();
       advanceLexer();
@@ -280,34 +258,42 @@ public class VimScriptParser implements PsiParser {
       if (atToken(OP_ASSIGN, OP_DOT_ASSIGN)) {
         advanceLexerSkippingWhitespaces();
 
-        parseExpression(builder.mark());
+        //parseExpression(builder.mark());
+        startMark.done(ASSIGNMENT_STMT);
       }
       else {
         advanceToNewLineCharacter();
-        startMarker.error("Assign operation for $env or @reg expected.");
+        startMark.error("Assign operation for $env or @reg expected.");
       }
     }
     else if (atToken(IDENTIFIER, OPTION)) {
+      PsiBuilder.Marker var = builder.mark();
+      advanceLexer();
+      var.done(VARIABLE);
+      skipWhitespaces();
+
+
       if (atToken(OP_ASSIGN, OP_DOT_ASSIGN, OP_MINUS_ASSIGN, OP_PLUS_ASSIGN)) {
         advanceLexerSkippingWhitespaces();
 
-        parseExpression(builder.mark());
+        //parseExpression(builder.mark());
+        startMark.done(ASSIGNMENT_STMT);
       }
       else {
         advanceToNewLineCharacter();
-        startMarker.error("Assign operator for variable or &option expected.");
+        startMark.error("Assign operator for variable or &option expected.");
       }
     }
     // Here should be array assignments
     else {
       advanceToNewLineCharacter();
-      startMarker.error("Could not parse assignment statement.");
+      startMark.error("Could not parse assignment statement.");
     }
     return true;
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
-    return false;
+    return true;
   }
   
   private boolean atToken(@NotNull TokenSet tokenSet, TokenSet ... tokenSets) {

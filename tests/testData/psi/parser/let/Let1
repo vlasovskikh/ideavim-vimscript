@@ -1,6 +1,5 @@
 VimScriptFile
-  Block(code block)
-    LetStatement(let {var} = {expr})
-      Keyword(keyword)
-        PsiElement(identifier)('let')
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
   PsiElement(NEW_LINE_INDENT)('\n')
