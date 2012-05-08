@@ -39,6 +39,10 @@ public class VimScriptPsiCreator {
       return new LetStatement(node);
     }
 
+    if (VimScriptElementTypes.ASSIGNMENT_STMT.equals(elementType)) {
+      return new PsiVimScriptElementImpl(node);
+    }
+
     if (VimScriptElementTypes.SET_STMT.equals(elementType)) {
       return new SetStatement(node);
     }

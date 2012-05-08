@@ -23,8 +23,14 @@ public interface VimScriptElementTypes {
   public static final IElementType KEYWORD = new VimScriptElementType("keyword");
   public static final IElementType VARIABLE = new VimScriptElementType("variable");
   public static final IElementType VALUE = new VimScriptElementType("value");
+
+  /* expressions */
   public static final IElementType EXPRESSION = new VimScriptElementType("expression");
   public static final IElementType ASSIGNMENT_STMT = new VimScriptElementType("assignment statement");
+  public static final IElementType TERNARY_EXPRESSION = new VimScriptElementType("ternary expression");
+  public static final IElementType CONDITION = new VimScriptElementType("condition");
+  public static final IElementType TERNARY_THEN = new VimScriptElementType("ternary then");
+  public static final IElementType TERNARY_ELSE = new VimScriptElementType("ternary else");
 
   /* let stmt's staff */
   public static final IElementType LET_STMT = new VimScriptElementType("let statement");

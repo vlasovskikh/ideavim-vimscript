@@ -223,15 +223,14 @@ public class VimScriptParser implements PsiParser {
       PsiBuilder.Marker mark = builder.mark();
       advanceLexer();
       mark.done(VARIABLE);
+      skipWhitespaces();
 
       if (endl()) {
-        skipWhitespaces();
         startMark.done(LET_STMT);
         advanceToNewLineCharacter();
 
       }
       else {
-        advanceLexer();
         if (atToken(identifier)) {
           while (!endl()) {
             mark = builder.mark();
@@ -245,7 +244,8 @@ public class VimScriptParser implements PsiParser {
           if (ENVIRONMENT_VARIABLE.equals(varType) || REGISTER.equals(varType)) {
             if (atToken(OP_ASSIGN, OP_DOT_ASSIGN)) {
               advanceLexerSkippingWhitespaces();
-              parseExpression(builder.mark());
+              PsiBuilder.Marker expression = builder.mark();
+              parseExpression(expression);
               assignmentStart.done(ASSIGNMENT_STMT);
               advanceToNewLineCharacter();
 
@@ -258,7 +258,8 @@ public class VimScriptParser implements PsiParser {
           else if (IDENTIFIER.equals(varType) || OPTION.equals(varType)) {
             if (atToken(OP_ASSIGN, OP_DOT_ASSIGN, OP_MINUS_ASSIGN, OP_PLUS_ASSIGN)) {
               advanceLexerSkippingWhitespaces();
-              parseExpression(builder.mark());
+              PsiBuilder.Marker expression = builder.mark();
+              parseExpression(expression);
               assignmentStart.done(ASSIGNMENT_STMT);
               advanceToNewLineCharacter();
 
@@ -288,6 +289,57 @@ public class VimScriptParser implements PsiParser {
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
+    parseTernaryExpression(startMarker);
+    return true;
+  }
+
+  private boolean parseTernaryExpression(PsiBuilder.Marker startMarker) {
+    PsiBuilder.Marker condition = builder.mark();
+    parseOrExpression(condition);
+    skipWhitespaces();
+    if (endl()) {
+      // parsed lower-level expression
+      // so there is no need in TERNARY_EXPRESSION element
+      condition.drop();
+      startMarker.drop();
+      advanceToNewLineCharacter();
+
+    }
+    else if (atToken(QUESTION_MARK)) {
+      // continue parsing
+      condition.done(CONDITION);
+      skipWhitespaces();
+      
+      PsiBuilder.Marker thenValue = builder.mark();
+      parseTernaryExpression(thenValue);
+      skipWhitespaces();
+      
+      if (atToken(COLON)) {
+        // right, continue parsing
+        thenValue.done(TERNARY_THEN);
+        skipWhitespaces();
+        
+        PsiBuilder.Marker elseValue = builder.mark();
+        parseTernaryExpression(elseValue);
+        elseValue.done(TERNARY_ELSE);
+        startMarker.done(TERNARY_EXPRESSION);
+
+      }
+      else {
+        thenValue.drop();
+        advanceToNewLineCharacter();
+        startMarker.error("Colon and else value expected but got only {cond}?expr");
+      }
+    }
+    else {
+      condition.drop();
+      advanceToNewLineCharacter();
+      startMarker.error("Valid expression expected.");
+    }
+    return true;
+  }
+
+  private boolean parseOrExpression(PsiBuilder.Marker startMark) {
     return true;
   }
   
