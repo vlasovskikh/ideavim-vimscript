@@ -1,0 +1,12 @@
+VimScriptFile
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
+    PsiWhiteSpace(' ')
+    PsiErrorElement:Assign operation for $env or @reg expected.
+      PsiElement(identifier)('var1')
+      PsiWhiteSpace(' ')
+      Variable(variable)
+        PsiElement(register)('@var2')
+      PsiWhiteSpace(' ')
+      PsiElement(identifier)('var3')
