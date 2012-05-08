@@ -219,6 +219,7 @@ public class VimScriptParser implements PsiParser {
 
     }
     else if (atToken(identifier)) {
+      IElementType varType = builder.getTokenType();
       PsiBuilder.Marker mark = builder.mark();
       advanceLexer();
       mark.done(VARIABLE);
@@ -240,7 +241,40 @@ public class VimScriptParser implements PsiParser {
           }
         }
         else {
-          parseAssignmentStatement(mark.precede());
+          PsiBuilder.Marker assignmentStart = mark.precede();
+          if (ENVIRONMENT_VARIABLE.equals(varType) || REGISTER.equals(varType)) {
+            if (atToken(OP_ASSIGN, OP_DOT_ASSIGN)) {
+              advanceLexerSkippingWhitespaces();
+              parseExpression(builder.mark());
+              assignmentStart.done(ASSIGNMENT_STMT);
+              advanceToNewLineCharacter();
+
+            }
+            else {
+              advanceToNewLineCharacter();
+              assignmentStart.error("Assign operation for $env or @reg expected.");
+            }
+          }
+          else if (IDENTIFIER.equals(varType) || OPTION.equals(varType)) {
+            if (atToken(OP_ASSIGN, OP_DOT_ASSIGN, OP_MINUS_ASSIGN, OP_PLUS_ASSIGN)) {
+              advanceLexerSkippingWhitespaces();
+              parseExpression(builder.mark());
+              assignmentStart.done(ASSIGNMENT_STMT);
+              advanceToNewLineCharacter();
+
+            }
+            else {
+              advanceToNewLineCharacter();
+              assignmentStart.error("Assign operator for variable or &option expected.");
+            }
+          }
+          // ListItem | Sublist | DictEntry
+          // [var0, [var1, ...] [: varn] ]
+          else {
+            advanceToNewLineCharacter();
+            assignmentStart.error("Could not parse assignment statement.");
+          }
+          
         }
         startMark.done(LET_STMT);
         advanceToNewLineCharacter();
@@ -251,56 +285,6 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMark.error("Variable expected.");
     }
-  }
-
-  /**
-   * Parses assignment statement.
-   * @param startMark marks the position before start of assignment statement.
-   * @return true if passed successfule, false otherwise.
-   */
-  private boolean parseAssignmentStatement(PsiBuilder.Marker startMark) {
-    if (atToken(ENVIRONMENT_VARIABLE, REGISTER)) {
-      PsiBuilder.Marker var = builder.mark();
-      advanceLexer();
-      var.done(VARIABLE);
-      skipWhitespaces();
-
-      if (atToken(OP_ASSIGN, OP_DOT_ASSIGN)) {
-        advanceLexerSkippingWhitespaces();
-        parseExpression(builder.mark());
-        startMark.done(ASSIGNMENT_STMT);
-        advanceToNewLineCharacter();
-
-      }
-      else {
-        advanceToNewLineCharacter();
-        startMark.error("Assign operation for $env or @reg expected.");
-      }
-    }
-    else if (atToken(IDENTIFIER, OPTION)) {
-      PsiBuilder.Marker var = builder.mark();
-      advanceLexer();
-      var.done(VARIABLE);
-      skipWhitespaces();
-
-
-      if (atToken(OP_ASSIGN, OP_DOT_ASSIGN, OP_MINUS_ASSIGN, OP_PLUS_ASSIGN)) {
-        advanceLexerSkippingWhitespaces();
-        parseExpression(builder.mark());
-        startMark.done(ASSIGNMENT_STMT);
-        advanceToNewLineCharacter();
-      }
-      else {
-        advanceToNewLineCharacter();
-        startMark.error("Assign operator for variable or &option expected.");
-      }
-    }
-    // Here should be array assignments
-    else {
-      advanceToNewLineCharacter();
-      startMark.error("Could not parse assignment statement.");
-    }
-    return true;
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
