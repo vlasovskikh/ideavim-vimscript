@@ -31,6 +31,8 @@ public interface VimScriptElementTypes {
   public static final IElementType CONDITION = new VimScriptElementType("condition");
   public static final IElementType TERNARY_THEN = new VimScriptElementType("ternary then");
   public static final IElementType TERNARY_ELSE = new VimScriptElementType("ternary else");
+  public static final IElementType OR_EXPRESSION = new VimScriptElementType("or expression");
+  public static final IElementType AND_EXPRESSION = new VimScriptElementType("and expression");
 
   /* let stmt's staff */
   public static final IElementType LET_STMT = new VimScriptElementType("let statement");

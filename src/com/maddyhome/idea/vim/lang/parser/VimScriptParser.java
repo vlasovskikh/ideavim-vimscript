@@ -300,15 +300,15 @@ public class VimScriptParser implements PsiParser {
     if (endl()) {
       // parsed lower-level expression
       // so there is no need in TERNARY_EXPRESSION element
-      condition.drop();
       startMarker.drop();
       advanceToNewLineCharacter();
 
     }
     else if (atToken(QUESTION_MARK)) {
       // continue parsing
+      condition = condition.precede();
       condition.done(CONDITION);
-      skipWhitespaces();
+      advanceLexerSkippingWhitespaces();
       
       PsiBuilder.Marker thenValue = builder.mark();
       parseTernaryExpression(thenValue);
@@ -317,7 +317,7 @@ public class VimScriptParser implements PsiParser {
       if (atToken(COLON)) {
         // right, continue parsing
         thenValue.done(TERNARY_THEN);
-        skipWhitespaces();
+        advanceLexerSkippingWhitespaces();
         
         PsiBuilder.Marker elseValue = builder.mark();
         parseTernaryExpression(elseValue);
@@ -328,18 +328,58 @@ public class VimScriptParser implements PsiParser {
       else {
         thenValue.drop();
         advanceToNewLineCharacter();
-        startMarker.error("Colon and else value expected but got only {cond}?expr");
+        startMarker.error("':' expected.");
       }
     }
     else {
       condition.drop();
       advanceToNewLineCharacter();
-      startMarker.error("Valid expression expected.");
+      startMarker.error("Newline or '?' expected.");
     }
     return true;
   }
 
-  private boolean parseOrExpression(PsiBuilder.Marker startMark) {
+  private boolean parseOrExpression(PsiBuilder.Marker startMarker) {
+    PsiBuilder.Marker elem = builder.mark();
+    parseAndExpression(elem);
+    skipWhitespaces();
+    if (endl()) {
+      // lower-level expression
+      startMarker.drop();
+      advanceToNewLineCharacter();
+
+    }
+    else if (atToken(OP_LOGICAL_OR)) {
+      // this-level expression
+      while (true) {
+        elem = builder.mark();
+        parseAndExpression(elem);
+        skipWhitespaces();
+        if (atToken(OP_LOGICAL_OR)) {
+          advanceLexerSkippingWhitespaces();
+        }
+        else if (endl()) {
+          startMarker.done(OR_EXPRESSION);
+          advanceToNewLineCharacter();
+          break;
+        }
+        else {
+          advanceToNewLineCharacter();
+          startMarker.error("Something wrong with '||'.");
+          break;
+        }
+      }
+    }
+    else {
+      advanceToNewLineCharacter();
+      startMarker.error("Newline or '||' expected.");
+    }
+    // */
+    return true;
+  }
+
+  private boolean parseAndExpression(PsiBuilder.Marker startMark) {
+    startMark.done(AND_EXPRESSION);
     return true;
   }
   
