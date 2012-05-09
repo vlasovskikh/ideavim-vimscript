@@ -414,11 +414,53 @@ public class VimScriptParser implements PsiParser {
   }
 
   private void parseComparisonExpression(PsiBuilder.Marker startMarker) {
-    startMarker.done(COMPARISON_EXPRESSION);
+    PsiBuilder.Marker left = builder.mark();
+    parsePlusMinusDotExpression(left);
+    skipWhitespaces();
+    if (endl()) {
+      // lower-level expression
+      startMarker.drop();
+      advanceToNewLineCharacter();
+
+    }
+    else if (atToken(comparisonOperators)) {
+      advanceLexer();
+      if (atToken(QUESTION_MARK, NUMBER_SIGN)) {
+        advanceLexer();
+      }
+      skipWhitespaces();
+      PsiBuilder.Marker right = builder.mark();
+      parsePlusMinusDotExpression(right);
+      startMarker.done(COMPARISON_EXPRESSION);
+
+    }
+    else {
+      advanceToNewLineCharacter();
+      startMarker.error("Newline or one of comparison operators expected.");
+    }
   }
 
   private void parsePlusMinusDotExpression(PsiBuilder.Marker startMarker) {
-    startMarker.done(PLUS_MINUS_DOT_EXPRESSION);
+    PsiBuilder.Marker left = builder.mark();
+    parseMultDivModExpression(left);
+    skipWhitespaces();
+    if (endl()) {
+      // lower-level expression
+      startMarker.drop();
+      advanceToNewLineCharacter();
+
+    }
+    else if (atToken(OP_PLUS, OP_MINUS, DOT)) {
+      skipWhitespaces();
+      PsiBuilder.Marker right = builder.mark();
+      parseMultDivModExpression(right);
+      startMarker.done(PLUS_MINUS_DOT_EXPRESSION);
+
+    }
+    else {
+      advanceToNewLineCharacter();
+      startMarker.error("Newline or one of '+', '-', '.' expected.");
+    }
   }
 
   private void parseMultDivModExpression(PsiBuilder.Marker startMarker) {
