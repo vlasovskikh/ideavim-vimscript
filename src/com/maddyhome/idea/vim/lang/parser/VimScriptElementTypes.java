@@ -33,6 +33,16 @@ public interface VimScriptElementTypes {
   public static final IElementType TERNARY_ELSE = new VimScriptElementType("ternary else");
   public static final IElementType OR_EXPRESSION = new VimScriptElementType("or expression");
   public static final IElementType AND_EXPRESSION = new VimScriptElementType("and expression");
+  public static final IElementType COMPARISON_EXPRESSION = new VimScriptElementType("comparison expression");
+  public static final IElementType PLUS_MINUS_DOT_EXPRESSION = new VimScriptElementType("plus-minus-dot expression");
+  public static final IElementType MULT_DIV_MOD_EXPRESSION = new VimScriptElementType("mult-div-mod expression");
+  public static final IElementType UNARY_EXPRESSION = new VimScriptElementType("unary expression");
+  public static final IElementType COLLECTION_ITEM_EXPRESSION = new VimScriptElementType("collection item expression");
+  public static final IElementType SUBCOLLECTION_EXPRESSION = new VimScriptElementType("subcollection expression");
+  public static final IElementType DICT_ITEM_EXPRESSION = new VimScriptElementType("dict item expression");
+  public static final IElementType NESTED_EXPRESSION = new VimScriptElementType("nested expression");
+  public static final IElementType FUNCTION_CALL = new VimScriptElementType("function call");
+
 
   /* let stmt's staff */
   public static final IElementType LET_STMT = new VimScriptElementType("let statement");
