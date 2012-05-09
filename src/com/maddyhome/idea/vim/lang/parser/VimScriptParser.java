@@ -293,7 +293,7 @@ public class VimScriptParser implements PsiParser {
     return true;
   }
 
-  private boolean parseTernaryExpression(PsiBuilder.Marker startMarker) {
+  private void parseTernaryExpression(PsiBuilder.Marker startMarker) {
     PsiBuilder.Marker condition = builder.mark();
     parseOrExpression(condition);
     skipWhitespaces();
@@ -336,10 +336,9 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMarker.error("Newline or '?' expected.");
     }
-    return true;
   }
 
-  private boolean parseOrExpression(PsiBuilder.Marker startMarker) {
+  private void parseOrExpression(PsiBuilder.Marker startMarker) {
     PsiBuilder.Marker elem = builder.mark();
     parseAndExpression(elem);
     skipWhitespaces();
@@ -374,13 +373,68 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMarker.error("Newline or '||' expected.");
     }
-    // */
-    return true;
   }
 
-  private boolean parseAndExpression(PsiBuilder.Marker startMark) {
-    startMark.done(AND_EXPRESSION);
-    return true;
+  private void parseAndExpression(PsiBuilder.Marker startMarker) {
+    PsiBuilder.Marker elem = builder.mark();
+    parseComparisonExpression(elem);
+    skipWhitespaces();
+
+    if (endl()) {
+      // lower-level expression
+      startMarker.drop();
+      advanceToNewLineCharacter();
+
+    }
+    else if (atToken(OP_LOGICAL_AND)) {
+      // this-level expression
+      while (true) {
+        elem = builder.mark();
+        parseComparisonExpression(elem);
+        skipWhitespaces();
+        if (atToken(OP_LOGICAL_AND)) {
+          advanceLexerSkippingWhitespaces();
+        }
+        else if (endl()) {
+          startMarker.done(AND_EXPRESSION);
+          advanceToNewLineCharacter();
+          break;
+        }
+        else {
+          advanceToNewLineCharacter();
+          startMarker.error("Something wrong with '&&'.");
+          break;
+        }
+      }
+    }
+    else {
+      advanceToNewLineCharacter();
+      startMarker.error("&& smth expected.");
+    }
+  }
+
+  private void parseComparisonExpression(PsiBuilder.Marker startMarker) {
+    startMarker.done(COMPARISON_EXPRESSION);
+  }
+
+  private void parsePlusMinusDotExpression(PsiBuilder.Marker startMarker) {
+    startMarker.done(PLUS_MINUS_DOT_EXPRESSION);
+  }
+
+  private void parseMultDivModExpression(PsiBuilder.Marker startMarker) {
+    startMarker.done(MULT_DIV_MOD_EXPRESSION);
+  }
+
+  private void parseUnaryExpression(PsiBuilder.Marker startMarker) {
+    startMarker.done(UNARY_EXPRESSION);
+  }
+
+  private void parseCollectionElemExpression(PsiBuilder.Marker startMark) {
+    startMark.done(SUBCOLLECTION_EXPRESSION);
+  }
+
+  private void parseLowestLevelExpression(PsiBuilder.Marker startMarker) {
+    startMarker.done(VALUE);
   }
   
   private boolean atToken(@NotNull TokenSet tokenSet, TokenSet ... tokenSets) {
