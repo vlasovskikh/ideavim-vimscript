@@ -116,6 +116,7 @@ Identifier = {Name}
 ","                         { return COMMA; }
 "?"                         { return QUESTION_MARK; }
 "!"                         { return EXCLAMATION_MARK; }
+"#"                         { return NUMBER_SIGN; }
 
 // quotes
 "\'"                        { return SINGLE_QUOTE; }

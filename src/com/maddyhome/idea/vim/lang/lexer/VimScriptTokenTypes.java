@@ -1,6 +1,5 @@
 package com.maddyhome.idea.vim.lang.lexer;
 
-import com.intellij.lang.ParserDefinition;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -65,6 +64,9 @@ public interface VimScriptTokenTypes {
   public static final IElementType OP_LT_EQ = new VimScriptElementType("<=");
   public static final IElementType OP_MATCHES = new VimScriptElementType("=~");
   public static final IElementType OP_NOT_MATCHES = new VimScriptElementType("!~");
+  public static final TokenSet comparisonOperators = TokenSet.create(
+    OP_EQUAL_TO, OP_NOT_EQUAL_TO, OP_GT, OP_GT_EQ, OP_LT, OP_LT_EQ, OP_MATCHES, OP_NOT_MATCHES
+  );
 
   public static final IElementType OP_LOGICAL_OR = new VimScriptElementType("||");
   public static final IElementType OP_LOGICAL_AND = new VimScriptElementType("&&");
@@ -78,6 +80,7 @@ public interface VimScriptTokenTypes {
   public static final IElementType DOT = new VimScriptElementType(".");
   public static final IElementType QUESTION_MARK = new VimScriptElementType("?");
   public static final IElementType EXCLAMATION_MARK = new VimScriptElementType("!");
+  public static final IElementType NUMBER_SIGN = new VimScriptElementType("#");
 
   /* identifier */
   public static final IElementType ENVIRONMENT_VARIABLE = new VimScriptElementType("envvar");
