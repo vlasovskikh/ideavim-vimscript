@@ -7,6 +7,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+
 import static com.maddyhome.idea.vim.lang.parser.VimScriptElementTypes.*;
 import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
 
@@ -18,6 +20,45 @@ import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
  */
 public class VimScriptParser implements PsiParser {
   private PsiBuilder builder;
+  
+  private static final int TERNARY_EXPRESSION_LEVEL = 0;
+  private static final int OR_EXPRESSION_LEVEL = 1;
+  private static final int AND_EXPRESSION_LEVEL = 2;
+  private static final int COMPARISON_EXPRESSION_LEVEL = 3;
+  private static final int PMD_EXPRESSION_LEVEL = 4;
+  private static final int MDM_EXPRESSION_LEVEL = 5;
+  private static ArrayList<ArrayList<IElementType>> operatorsByLevel = new ArrayList<ArrayList<IElementType>>(9);
+
+  static {
+    // It's ternary expression.
+    operatorsByLevel.get(TERNARY_EXPRESSION_LEVEL).add(QUESTION_MARK);
+    operatorsByLevel.get(TERNARY_EXPRESSION_LEVEL).add(COLON);
+    
+    operatorsByLevel.get(OR_EXPRESSION_LEVEL).add(OP_LOGICAL_OR);
+    
+    operatorsByLevel.get(AND_EXPRESSION_LEVEL).add(OP_LOGICAL_AND);
+    
+    for (IElementType type : comparisonOperators.getTypes()) {
+      operatorsByLevel.get(COMPARISON_EXPRESSION_LEVEL).add(type);
+    }
+    
+    operatorsByLevel.get(PMD_EXPRESSION_LEVEL).add(OP_PLUS);
+    operatorsByLevel.get(PMD_EXPRESSION_LEVEL).add(OP_MINUS);
+    operatorsByLevel.get(PMD_EXPRESSION_LEVEL).add(DOT);
+    
+    operatorsByLevel.get(MDM_EXPRESSION_LEVEL).add(OP_MULT);
+    operatorsByLevel.get(MDM_EXPRESSION_LEVEL).add(OP_DIV);
+    operatorsByLevel.get(MDM_EXPRESSION_LEVEL).add(OP_MOD);
+
+    // It's unary expression, may be there is no need in this element.
+    // operatorsByLevel.get(6);
+    
+    // It's: list item, sublist, dictionary item. May not be needed, too. 
+    // operatorsByLevel.get(7);
+    
+    // It's: value, variable, nested expression, function call. May not be needed.
+    // operatorsByLevel.get(8);
+  }
 
   @NotNull
   @Override
@@ -77,7 +118,7 @@ public class VimScriptParser implements PsiParser {
     keyword.done(KEYWORD);
     skipWhitespaces();
 
-    if (endl()) {
+    if (eol()) {
       startMark.done(SET_STMT);
       advanceToNewLineCharacter();
     }
@@ -194,12 +235,12 @@ public class VimScriptParser implements PsiParser {
           mark.error("Smth different expected");
         }
       }
-      else if (!atToken(IDENTIFIER) && !atToken(WHITESPACE) && !endl()) {
+      else if (!atToken(IDENTIFIER) && !atToken(WHITESPACE) && !eol()) {
         PsiBuilder.Marker mark = builder.mark();
         advanceToNewLineCharacter();
         mark.error("Identifier expected");
       }
-    } while (!endl());
+    } while (!eol());
   }
 
   /**
@@ -213,7 +254,7 @@ public class VimScriptParser implements PsiParser {
     keyword.done(KEYWORD);
     skipWhitespaces();
 
-    if (endl()) {
+    if (eol()) {
       startMark.done(LET_STMT);
       advanceToNewLineCharacter();
 
@@ -225,14 +266,14 @@ public class VimScriptParser implements PsiParser {
       mark.done(VARIABLE);
       skipWhitespaces();
 
-      if (endl()) {
+      if (eol()) {
         startMark.done(LET_STMT);
         advanceToNewLineCharacter();
 
       }
       else {
         if (atToken(identifier)) {
-          while (!endl()) {
+          while (!eol()) {
             mark = builder.mark();
             advanceLexer();
             mark.done(VARIABLE);
@@ -289,19 +330,21 @@ public class VimScriptParser implements PsiParser {
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
-    parseTernaryExpression(startMarker);
+    parseTernaryExpression(startMarker, false);
     return true;
   }
 
-  private void parseTernaryExpression(PsiBuilder.Marker startMarker) {
+  private boolean parseExpression(PsiBuilder.Marker startMarker, boolean isNested) {
+    parseTernaryExpression(startMarker, isNested);
+    return true;
+  }
+
+  private void parseTernaryExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker condition = builder.mark();
-    parseOrExpression(condition);
-    skipWhitespaces();
-    if (endl()) {
-      // parsed lower-level expression
-      // so there is no need in TERNARY_EXPRESSION element
+    parseOrExpression(condition, false);
+    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET))) {
+      // lower-level expression
       startMarker.drop();
-      advanceToNewLineCharacter();
 
     }
     else if (atToken(QUESTION_MARK)) {
@@ -311,16 +354,15 @@ public class VimScriptParser implements PsiParser {
       advanceLexerSkippingWhitespaces();
       
       PsiBuilder.Marker thenValue = builder.mark();
-      parseTernaryExpression(thenValue);
-      skipWhitespaces();
-      
+      parseTernaryExpression(thenValue, false);
+
       if (atToken(COLON)) {
         // right, continue parsing
         thenValue.done(TERNARY_THEN);
         advanceLexerSkippingWhitespaces();
         
         PsiBuilder.Marker elseValue = builder.mark();
-        parseTernaryExpression(elseValue);
+        parseTernaryExpression(elseValue, isNested);
         elseValue.done(TERNARY_ELSE);
         startMarker.done(TERNARY_EXPRESSION);
 
@@ -336,30 +378,27 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMarker.error("Newline or '?' expected.");
     }
+    skipWhitespaces();
   }
 
-  private void parseOrExpression(PsiBuilder.Marker startMarker) {
+  private void parseOrExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker elem = builder.mark();
-    parseAndExpression(elem);
-    skipWhitespaces();
-    if (endl()) {
+    parseAndExpression(elem, isNested);
+    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(OR_EXPRESSION_LEVEL)) {
       // lower-level expression
       startMarker.drop();
-      advanceToNewLineCharacter();
 
     }
     else if (atToken(OP_LOGICAL_OR)) {
       // this-level expression
       while (true) {
         elem = builder.mark();
-        parseAndExpression(elem);
-        skipWhitespaces();
+        parseAndExpression(elem, isNested);
         if (atToken(OP_LOGICAL_OR)) {
           advanceLexerSkippingWhitespaces();
         }
-        else if (endl()) {
+        else if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(OR_EXPRESSION_LEVEL)) {
           startMarker.done(OR_EXPRESSION);
-          advanceToNewLineCharacter();
           break;
         }
         else {
@@ -373,31 +412,28 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMarker.error("Newline or '||' expected.");
     }
+    skipWhitespaces();
   }
 
-  private void parseAndExpression(PsiBuilder.Marker startMarker) {
+  private void parseAndExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker elem = builder.mark();
-    parseComparisonExpression(elem);
-    skipWhitespaces();
+    parseComparisonExpression(elem, isNested);
 
-    if (endl()) {
+    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(AND_EXPRESSION_LEVEL)) {
       // lower-level expression
       startMarker.drop();
-      advanceToNewLineCharacter();
 
     }
     else if (atToken(OP_LOGICAL_AND)) {
       // this-level expression
       while (true) {
         elem = builder.mark();
-        parseComparisonExpression(elem);
-        skipWhitespaces();
+        parseComparisonExpression(elem, isNested);
         if (atToken(OP_LOGICAL_AND)) {
           advanceLexerSkippingWhitespaces();
         }
-        else if (endl()) {
+        else if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(AND_EXPRESSION_LEVEL)) {
           startMarker.done(AND_EXPRESSION);
-          advanceToNewLineCharacter();
           break;
         }
         else {
@@ -411,16 +447,15 @@ public class VimScriptParser implements PsiParser {
       advanceToNewLineCharacter();
       startMarker.error("&& smth expected.");
     }
+    skipWhitespaces();
   }
 
-  private void parseComparisonExpression(PsiBuilder.Marker startMarker) {
+  private void parseComparisonExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker left = builder.mark();
-    parsePlusMinusDotExpression(left);
-    skipWhitespaces();
-    if (endl()) {
+    parsePlusMinusDotExpression(left, isNested);
+    if (eol()) {
       // lower-level expression
       startMarker.drop();
-      advanceToNewLineCharacter();
 
     }
     else if (atToken(comparisonOperators)) {
@@ -430,8 +465,9 @@ public class VimScriptParser implements PsiParser {
       }
       skipWhitespaces();
       PsiBuilder.Marker right = builder.mark();
-      parsePlusMinusDotExpression(right);
+      parsePlusMinusDotExpression(right, isNested);
       startMarker.done(COMPARISON_EXPRESSION);
+      skipWhitespaces();
 
     }
     else {
@@ -440,43 +476,125 @@ public class VimScriptParser implements PsiParser {
     }
   }
 
-  private void parsePlusMinusDotExpression(PsiBuilder.Marker startMarker) {
-    PsiBuilder.Marker left = builder.mark();
-    parseMultDivModExpression(left);
-    skipWhitespaces();
-    if (endl()) {
+  private void parsePlusMinusDotExpression(PsiBuilder.Marker startMarker, boolean isNested) {
+    PsiBuilder.Marker elem = builder.mark();
+    parseMultDivModExpression(elem, isNested);
+    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET) || isHigherLevelToken(PMD_EXPRESSION_LEVEL))) {
       // lower-level expression
       startMarker.drop();
-      advanceToNewLineCharacter();
 
     }
     else if (atToken(OP_PLUS, OP_MINUS, DOT)) {
       skipWhitespaces();
-      PsiBuilder.Marker right = builder.mark();
-      parseMultDivModExpression(right);
-      startMarker.done(PLUS_MINUS_DOT_EXPRESSION);
-
+      while (true) {
+        elem = builder.mark();
+        parseMultDivModExpression(elem, isNested);
+        if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET) || isHigherLevelToken(PMD_EXPRESSION_LEVEL))) {
+          startMarker.done(PLUS_MINUS_DOT_EXPRESSION);
+          break;
+        }
+        else if (atToken(OP_PLUS, OP_MINUS, DOT)) {
+          advanceLexerSkippingWhitespaces();
+        }
+        else {
+          advanceToNewLineCharacter();
+          startMarker.error("Something wrong with '+', '-' or '.'.");
+        }
+      }
     }
     else {
       advanceToNewLineCharacter();
-      startMarker.error("Newline or one of '+', '-', '.' expected.");
+      startMarker.error("Newline or op. with higher priority or one of '+', '-', '.', ')' expected.");
     }
+    skipWhitespaces();
   }
 
-  private void parseMultDivModExpression(PsiBuilder.Marker startMarker) {
-    startMarker.done(MULT_DIV_MOD_EXPRESSION);
+  private void parseMultDivModExpression(PsiBuilder.Marker startMarker, boolean isNested) {
+    PsiBuilder.Marker elem = builder.mark();
+    parseUnaryExpression(elem, isNested);
+    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(MDM_EXPRESSION_LEVEL)) {
+      startMarker.drop();
+
+    }
+    else if (atToken(OP_MULT, OP_DIV, OP_MOD)) {
+      skipWhitespaces();
+      while (true) {
+        elem = builder.mark();
+        parseUnaryExpression(elem, isNested);
+        if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET) || isHigherLevelToken(MDM_EXPRESSION_LEVEL))) {
+          startMarker.done(MULT_DIV_MOD_EXPRESSION);
+          break;
+        }
+        else if (atToken(OP_MULT, OP_DIV, OP_MOD)) {
+          advanceLexerSkippingWhitespaces();
+        }
+        else {
+          advanceToNewLineCharacter();
+          startMarker.error("Something wrong with '*', '/' or '%'.");
+        }
+      }
+    }
+    else {
+      advanceToNewLineCharacter();
+      startMarker.error("Newline or op. with higher priority or one of '*', '/', '%', ')' expected.");
+    }
+    skipWhitespaces();
   }
 
-  private void parseUnaryExpression(PsiBuilder.Marker startMarker) {
+  private void parseUnaryExpression(PsiBuilder.Marker startMarker, boolean isNested) {
+    if (atToken(OP_PLUS, OP_MINUS, EXCLAMATION_MARK)) {
+      advanceLexerSkippingWhitespaces();
+    }
+    PsiBuilder.Marker expr = builder.mark();
+    parseCollectionElemExpression(expr, isNested);
     startMarker.done(UNARY_EXPRESSION);
   }
 
-  private void parseCollectionElemExpression(PsiBuilder.Marker startMark) {
-    startMark.done(SUBCOLLECTION_EXPRESSION);
+  private void parseCollectionElemExpression(PsiBuilder.Marker startMarker, boolean isNested) {
+    if (atToken(identifier)) {
+      PsiBuilder.Marker var = builder.mark();
+      advanceLexer();
+      if (atToken(DOT)) {
+        // dictionary entry
+        var.done(DICT_NAME);
+        advanceLexer();
+        PsiBuilder.Marker key = builder.mark();
+        if (atToken(IDENTIFIER, DICT_KEY_STRING)) {
+          advanceLexer();
+          key.done(DICT_KEY);
+          startMarker.done(COLLECTION_ITEM_EXPRESSION);
+        }
+        else {
+          advanceToNewLineCharacter();
+          startMarker.error("Wrong dictionary key");
+        }
+      }
+      else if (atToken(LEFT_SQUARE_BRACKET)) {
+        // list item or sublist
+        advanceLexer();
+
+      }
+      else {
+        parseLowestLevelExpression(startMarker, isNested);
+      }
+    }
+    else {
+      parseLowestLevelExpression(startMarker, isNested);
+    }
+    skipWhitespaces();
   }
 
-  private void parseLowestLevelExpression(PsiBuilder.Marker startMarker) {
+  private void parseLowestLevelExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     startMarker.done(VALUE);
+  }
+  
+  private boolean isHigherLevelToken(int level) {
+    for (int i = 0; i < level; ++i) {
+      if (operatorsByLevel.get(i).contains(builder.getTokenType())) {
+        return true;
+      }
+    }
+    return false;
   }
   
   private boolean atToken(@NotNull TokenSet tokenSet, TokenSet ... tokenSets) {
@@ -517,18 +635,23 @@ public class VimScriptParser implements PsiParser {
   }
 
   private boolean whitespace() {
-    return atToken(WHITESPACE) || endl();
+    return atToken(WHITESPACE) || eol();
   }
 
-  private boolean endl() {
+  private boolean eol() {
     PsiBuilder.Marker marker = builder.mark();
     if (atToken(WHITESPACE)) {
       skipWhitespaces();
     }
-    boolean isEndl = NEW_LINE.equals(builder.getTokenType()) || builder.eof();
+    boolean isEOL = NEW_LINE.equals(builder.getTokenType()) || builder.eof();
     marker.rollbackTo();
-    return isEndl;
+    return isEOL;
   }
+
+
+  /**
+   * Various advance functions.
+   */
 
   private void advanceLexer() {
     builder.advanceLexer();

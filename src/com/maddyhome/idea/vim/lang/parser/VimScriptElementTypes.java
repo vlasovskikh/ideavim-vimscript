@@ -40,6 +40,8 @@ public interface VimScriptElementTypes {
   public static final IElementType COLLECTION_ITEM_EXPRESSION = new VimScriptElementType("collection item expression");
   public static final IElementType SUBCOLLECTION_EXPRESSION = new VimScriptElementType("subcollection expression");
   public static final IElementType DICT_ITEM_EXPRESSION = new VimScriptElementType("dict item expression");
+  public static final IElementType DICT_NAME = new VimScriptElementType("dict name");
+  public static final IElementType DICT_KEY = new VimScriptElementType("dict key");
   public static final IElementType NESTED_EXPRESSION = new VimScriptElementType("nested expression");
   public static final IElementType FUNCTION_CALL = new VimScriptElementType("function call");
 
