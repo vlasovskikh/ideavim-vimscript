@@ -53,6 +53,7 @@ EnvironmentVariable = \${Name}
 Option = &{Name}
 Register = @{Name}
 Identifier = {Name}
+KeyString = [_A-Za-z0-9]+
 
 %%
 
@@ -95,6 +96,7 @@ Identifier = {Name}
 {Option}                    { return OPTION; }
 {Register}                  { return REGISTER; }
 {Identifier}                { return IDENTIFIER; }
+{KeyString}                 { return DICT_KEY_STRING; }
 
 \'{String}\'                |
 \"{String}\"                { return STRING; }

@@ -88,6 +88,7 @@ public interface VimScriptTokenTypes {
   public static final IElementType REGISTER = new VimScriptElementType("register");
   public static final IElementType VARIABLE_WITH_PREFIX = new VimScriptElementType("prefix:varname");
   public static final IElementType IDENTIFIER = new VimScriptElementType("identifier");
+  public static final IElementType DICT_KEY_STRING = new VimScriptElementType("dictionary key string");
   public static final TokenSet identifier = TokenSet.create(
       ENVIRONMENT_VARIABLE, OPTION, REGISTER, VARIABLE_WITH_PREFIX, IDENTIFIER
   );
