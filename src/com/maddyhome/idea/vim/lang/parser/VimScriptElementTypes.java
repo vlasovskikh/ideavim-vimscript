@@ -38,6 +38,7 @@ public interface VimScriptElementTypes {
   public static final IElementType MULT_DIV_MOD_EXPRESSION = new VimScriptElementType("mult-div-mod expression");
   public static final IElementType UNARY_EXPRESSION = new VimScriptElementType("unary expression");
   public static final IElementType COLLECTION_ITEM_EXPRESSION = new VimScriptElementType("collection item expression");
+  public static final IElementType COLLECTION_ITEM_ID_EXPRESSION = new VimScriptElementType("collection item id expression");
   public static final IElementType SUBCOLLECTION_EXPRESSION = new VimScriptElementType("subcollection expression");
   public static final IElementType DICT_ITEM_EXPRESSION = new VimScriptElementType("dict item expression");
   public static final IElementType DICT_NAME = new VimScriptElementType("dict name");

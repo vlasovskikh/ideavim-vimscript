@@ -342,7 +342,7 @@ public class VimScriptParser implements PsiParser {
   private void parseTernaryExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker condition = builder.mark();
     parseOrExpression(condition, false);
-    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET))) {
+    if (eol() || (isNested && eon())) {
       // lower-level expression
       startMarker.drop();
 
@@ -384,7 +384,7 @@ public class VimScriptParser implements PsiParser {
   private void parseOrExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker elem = builder.mark();
     parseAndExpression(elem, isNested);
-    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(OR_EXPRESSION_LEVEL)) {
+    if (eol() || (isNested && eon()) || isHigherLevelToken(OR_EXPRESSION_LEVEL)) {
       // lower-level expression
       startMarker.drop();
 
@@ -397,7 +397,7 @@ public class VimScriptParser implements PsiParser {
         if (atToken(OP_LOGICAL_OR)) {
           advanceLexerSkippingWhitespaces();
         }
-        else if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(OR_EXPRESSION_LEVEL)) {
+        else if (eol() || (isNested && eon()) || isHigherLevelToken(OR_EXPRESSION_LEVEL)) {
           startMarker.done(OR_EXPRESSION);
           break;
         }
@@ -419,7 +419,7 @@ public class VimScriptParser implements PsiParser {
     PsiBuilder.Marker elem = builder.mark();
     parseComparisonExpression(elem, isNested);
 
-    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(AND_EXPRESSION_LEVEL)) {
+    if (eol() || (isNested && eon()) || isHigherLevelToken(AND_EXPRESSION_LEVEL)) {
       // lower-level expression
       startMarker.drop();
 
@@ -432,7 +432,7 @@ public class VimScriptParser implements PsiParser {
         if (atToken(OP_LOGICAL_AND)) {
           advanceLexerSkippingWhitespaces();
         }
-        else if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(AND_EXPRESSION_LEVEL)) {
+        else if (eol() || (isNested && eon()) || isHigherLevelToken(AND_EXPRESSION_LEVEL)) {
           startMarker.done(AND_EXPRESSION);
           break;
         }
@@ -479,7 +479,7 @@ public class VimScriptParser implements PsiParser {
   private void parsePlusMinusDotExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker elem = builder.mark();
     parseMultDivModExpression(elem, isNested);
-    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET) || isHigherLevelToken(PMD_EXPRESSION_LEVEL))) {
+    if (eol() || (isNested && eon()) || isHigherLevelToken(PMD_EXPRESSION_LEVEL)) {
       // lower-level expression
       startMarker.drop();
 
@@ -489,7 +489,7 @@ public class VimScriptParser implements PsiParser {
       while (true) {
         elem = builder.mark();
         parseMultDivModExpression(elem, isNested);
-        if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET) || isHigherLevelToken(PMD_EXPRESSION_LEVEL))) {
+        if (eol() || (isNested && eon()) || isHigherLevelToken(PMD_EXPRESSION_LEVEL)) {
           startMarker.done(PLUS_MINUS_DOT_EXPRESSION);
           break;
         }
@@ -512,7 +512,7 @@ public class VimScriptParser implements PsiParser {
   private void parseMultDivModExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker elem = builder.mark();
     parseUnaryExpression(elem, isNested);
-    if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET)) || isHigherLevelToken(MDM_EXPRESSION_LEVEL)) {
+    if (eol() || (isNested && eon()) || isHigherLevelToken(MDM_EXPRESSION_LEVEL)) {
       startMarker.drop();
 
     }
@@ -521,7 +521,7 @@ public class VimScriptParser implements PsiParser {
       while (true) {
         elem = builder.mark();
         parseUnaryExpression(elem, isNested);
-        if (eol() || (isNested && atToken(RIGHT_ROUND_BRACKET) || isHigherLevelToken(MDM_EXPRESSION_LEVEL))) {
+        if (eol() || (isNested && eon()) || isHigherLevelToken(MDM_EXPRESSION_LEVEL)) {
           startMarker.done(MULT_DIV_MOD_EXPRESSION);
           break;
         }
@@ -562,7 +562,7 @@ public class VimScriptParser implements PsiParser {
         if (atToken(IDENTIFIER, DICT_KEY_STRING)) {
           advanceLexer();
           key.done(DICT_KEY);
-          startMarker.done(COLLECTION_ITEM_EXPRESSION);
+          startMarker.done(DICT_ITEM_EXPRESSION);
         }
         else {
           advanceToNewLineCharacter();
@@ -572,6 +572,36 @@ public class VimScriptParser implements PsiParser {
       else if (atToken(LEFT_SQUARE_BRACKET)) {
         // list item or sublist
         advanceLexer();
+        PsiBuilder.Marker elemId = builder.mark();
+        parseExpression(elemId, true);
+        if (atToken(RIGHT_SQUARE_BRACKET)) {
+          var.done(COLLECTION_ITEM_ID_EXPRESSION);
+          advanceLexer();
+          startMarker.done(COLLECTION_ITEM_EXPRESSION);
+
+        }
+        else if (atToken(COLON)) {
+          var.done(COLLECTION_ITEM_ID_EXPRESSION);
+          advanceLexerSkippingWhitespaces();
+          elemId = builder.mark();
+          parseExpression(elemId);
+          if (atToken(RIGHT_SQUARE_BRACKET)) {
+            var = elemId.precede();
+            var.done(COLLECTION_ITEM_ID_EXPRESSION);
+            advanceLexer();
+            startMarker.done(SUBCOLLECTION_EXPRESSION);
+
+          }
+          else {
+            advanceToNewLineCharacter();
+            startMarker.error("']' expected.");
+          }
+
+        }
+        else {
+          advanceToNewLineCharacter();
+          startMarker.error("']' or ':' expected.");
+        }
 
       }
       else {
@@ -585,10 +615,67 @@ public class VimScriptParser implements PsiParser {
   }
 
   private void parseLowestLevelExpression(PsiBuilder.Marker startMarker, boolean isNested) {
-    startMarker.done(VALUE);
+    if (atToken(string, number)) {
+      advanceLexer();
+      startMarker.done(VALUE);
+
+    } else if (atToken(identifier)) {
+      advanceLexerSkippingWhitespaces();
+      if (atToken(LEFT_ROUND_BRACKET)) {
+        advanceLexerSkippingWhitespaces();
+        if (atToken(RIGHT_ROUND_BRACKET)) {
+          advanceLexer();
+          startMarker.done(FUNCTION_CALL);
+
+        }
+        else {
+          while (true) {
+            PsiBuilder.Marker param = builder.mark();
+            parseExpression(param);
+            if (atToken(COMMA)) {
+              advanceLexerSkippingWhitespaces();
+            }
+            else if (atToken(RIGHT_ROUND_BRACKET)) {
+              advanceLexer();
+              startMarker.done(FUNCTION_CALL);
+              break;
+            }
+            else {
+              advanceToNewLineCharacter();
+              startMarker.error("Invalid function call.");
+              break;
+            }
+          }
+        }
+
+      }
+      else {
+        advanceLexer();
+        startMarker.done(VARIABLE);
+      }
+
+    } else if (atToken(LEFT_ROUND_BRACKET)) {
+      advanceLexer();
+      PsiBuilder.Marker nested = builder.mark();
+      parseExpression(nested, true);
+      if (atToken(RIGHT_ROUND_BRACKET)) {
+        advanceLexer();
+        startMarker.done(NESTED_EXPRESSION);
+
+      }
+      else {
+        advanceToNewLineCharacter();
+        startMarker.error("')' expected.");
+      }
+
+    }
+    skipWhitespaces();
   }
   
   private boolean isHigherLevelToken(int level) {
+    if (COMMA.equals(builder.getTokenType())) {
+      return true;
+    }
     for (int i = 0; i < level; ++i) {
       if (operatorsByLevel.get(i).contains(builder.getTokenType())) {
         return true;
@@ -638,11 +725,14 @@ public class VimScriptParser implements PsiParser {
     return atToken(WHITESPACE) || eol();
   }
 
+  private boolean eon() {
+    skipWhitespaces();
+    return atToken(RIGHT_ROUND_BRACKET) || atToken(RIGHT_SQUARE_BRACKET);
+  }
+
   private boolean eol() {
     PsiBuilder.Marker marker = builder.mark();
-    if (atToken(WHITESPACE)) {
-      skipWhitespaces();
-    }
+    skipWhitespaces();
     boolean isEOL = NEW_LINE.equals(builder.getTokenType()) || builder.eof();
     marker.rollbackTo();
     return isEOL;
