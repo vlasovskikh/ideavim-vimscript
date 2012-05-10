@@ -30,14 +30,17 @@ public class VimScriptParser implements PsiParser {
   private static ArrayList<ArrayList<IElementType>> operatorsByLevel = new ArrayList<ArrayList<IElementType>>(9);
 
   static {
-    // It's ternary expression.
+    for (int i = 0; i < 9; ++i) {
+      operatorsByLevel.add(i, new ArrayList<IElementType>());
+    }
+
     operatorsByLevel.get(TERNARY_EXPRESSION_LEVEL).add(QUESTION_MARK);
     operatorsByLevel.get(TERNARY_EXPRESSION_LEVEL).add(COLON);
     
     operatorsByLevel.get(OR_EXPRESSION_LEVEL).add(OP_LOGICAL_OR);
     
     operatorsByLevel.get(AND_EXPRESSION_LEVEL).add(OP_LOGICAL_AND);
-    
+    System.out.println("before for");
     for (IElementType type : comparisonOperators.getTypes()) {
       operatorsByLevel.get(COMPARISON_EXPRESSION_LEVEL).add(type);
     }
@@ -58,6 +61,7 @@ public class VimScriptParser implements PsiParser {
     
     // It's: value, variable, nested expression, function call. May not be needed.
     // operatorsByLevel.get(8);
+    System.out.println("Parser initialized");
   }
 
   @NotNull
