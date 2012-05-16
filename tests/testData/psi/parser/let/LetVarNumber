@@ -6,6 +6,6 @@ VimScriptFile
     PsiVimScriptElementImpl(assignment statement)
       Variable(variable)
         PsiElement(identifier)('var')
-      PsiElement(.=)('.=')
-      PsiErrorElement:Expression expected.
-        <empty list>
+      PsiElement(=)('=')
+      PsiVimScriptToken:value
+        PsiElement(int)('12')

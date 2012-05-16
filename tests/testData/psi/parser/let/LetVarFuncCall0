@@ -5,7 +5,11 @@ VimScriptFile
     PsiWhiteSpace(' ')
     PsiVimScriptElementImpl(assignment statement)
       Variable(variable)
-        PsiElement(identifier)('var')
+        PsiElement(identifier)('a')
+      PsiWhiteSpace(' ')
       PsiElement(=)('=')
-      PsiErrorElement:Expression expected.
-        <empty list>
+      PsiWhiteSpace(' ')
+      PsiVimScriptToken:function call
+        PsiElement(identifier)('get_a')
+        PsiElement(()('(')
+        PsiElement())(')')

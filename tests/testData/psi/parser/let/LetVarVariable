@@ -6,6 +6,8 @@ VimScriptFile
     PsiVimScriptElementImpl(assignment statement)
       Variable(variable)
         PsiElement(identifier)('var')
-      PsiElement(.=)('.=')
-      PsiErrorElement:Expression expected.
-        <empty list>
+      PsiWhiteSpace(' ')
+      PsiElement(=)('=')
+      PsiWhiteSpace(' ')
+      Variable(variable)
+        PsiElement(identifier)('another_variable')

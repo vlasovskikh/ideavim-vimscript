@@ -331,12 +331,14 @@ public class VimScriptParser implements PsiParser {
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
-    parseTernaryExpression(startMarker, false);
+    //parseTernaryExpression(startMarker, false);
+    parseCollectionElemExpression(startMarker, false);
     return true;
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker, boolean isNested) {
-    parseTernaryExpression(startMarker, isNested);
+    //parseTernaryExpression(startMarker, isNested);
+    parseCollectionElemExpression(startMarker, isNested);
     return true;
   }
 
@@ -652,7 +654,6 @@ public class VimScriptParser implements PsiParser {
 
       }
       else {
-        advanceLexer();
         startMarker.done(VARIABLE);
       }
 
@@ -673,7 +674,7 @@ public class VimScriptParser implements PsiParser {
     }
     else {
       advanceToNewLineCharacter();
-      startMarker.error("Eror parsing expr9");
+      startMarker.error("Expression expected.");
     }
     skipWhitespaces();
   }
