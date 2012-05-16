@@ -40,7 +40,6 @@ public class VimScriptParser implements PsiParser {
     operatorsByLevel.get(OR_EXPRESSION_LEVEL).add(OP_LOGICAL_OR);
     
     operatorsByLevel.get(AND_EXPRESSION_LEVEL).add(OP_LOGICAL_AND);
-    System.out.println("before for");
     for (IElementType type : comparisonOperators.getTypes()) {
       operatorsByLevel.get(COMPARISON_EXPRESSION_LEVEL).add(type);
     }
@@ -61,7 +60,6 @@ public class VimScriptParser implements PsiParser {
     
     // It's: value, variable, nested expression, function call. May not be needed.
     // operatorsByLevel.get(8);
-    System.out.println("Parser initialized");
   }
 
   @NotNull
@@ -250,7 +248,6 @@ public class VimScriptParser implements PsiParser {
   /**
    * Parses 'let' statement.
    * @param startMark marks the position before 'let' keyword.
-   * @return true if parsed successful, false otherwise.
    */
   private void parseLetStatement(PsiBuilder.Marker startMark) {
     PsiBuilder.Marker keyword = builder.mark();
@@ -353,8 +350,8 @@ public class VimScriptParser implements PsiParser {
     }
     else if (atToken(QUESTION_MARK)) {
       // continue parsing
-      condition = condition.precede();
-      condition.done(CONDITION);
+      PsiBuilder.Marker cond = condition.precede();
+      cond.done(CONDITION);
       advanceLexerSkippingWhitespaces();
       
       PsiBuilder.Marker thenValue = builder.mark();
@@ -457,7 +454,7 @@ public class VimScriptParser implements PsiParser {
   private void parseComparisonExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     PsiBuilder.Marker left = builder.mark();
     parsePlusMinusDotExpression(left, isNested);
-    if (eol()) {
+    if (eol() || (isNested && eon()) || isHigherLevelToken(COMPARISON_EXPRESSION_LEVEL)) {
       // lower-level expression
       startMarker.drop();
 
@@ -556,11 +553,11 @@ public class VimScriptParser implements PsiParser {
 
   private void parseCollectionElemExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     if (atToken(identifier)) {
-      PsiBuilder.Marker var = builder.mark();
       advanceLexer();
       if (atToken(DOT)) {
         // dictionary entry
-        var.done(DICT_NAME);
+        startMarker.done(DICT_NAME);
+        startMarker = startMarker.precede();
         advanceLexer();
         PsiBuilder.Marker key = builder.mark();
         if (atToken(IDENTIFIER, DICT_KEY_STRING)) {
@@ -579,28 +576,28 @@ public class VimScriptParser implements PsiParser {
         PsiBuilder.Marker elemId = builder.mark();
         parseExpression(elemId, true);
         if (atToken(RIGHT_SQUARE_BRACKET)) {
-          var.done(COLLECTION_ITEM_ID_EXPRESSION);
+          startMarker.done(COLLECTION_ITEM_ID_EXPRESSION);
+          startMarker = startMarker.precede();
           advanceLexer();
           startMarker.done(COLLECTION_ITEM_EXPRESSION);
 
         }
         else if (atToken(COLON)) {
-          var.done(COLLECTION_ITEM_ID_EXPRESSION);
+          startMarker.done(COLLECTION_ITEM_ID_EXPRESSION);
+          startMarker = startMarker.precede();
           advanceLexerSkippingWhitespaces();
           elemId = builder.mark();
           parseExpression(elemId);
           if (atToken(RIGHT_SQUARE_BRACKET)) {
-            var = elemId.precede();
-            var.done(COLLECTION_ITEM_ID_EXPRESSION);
+            elemId = elemId.precede();
+            elemId.done(COLLECTION_ITEM_ID_EXPRESSION);
             advanceLexer();
             startMarker.done(SUBCOLLECTION_EXPRESSION);
-
           }
           else {
             advanceToNewLineCharacter();
             startMarker.error("']' expected.");
           }
-
         }
         else {
           advanceToNewLineCharacter();
@@ -623,7 +620,8 @@ public class VimScriptParser implements PsiParser {
       advanceLexer();
       startMarker.done(VALUE);
 
-    } else if (atToken(identifier)) {
+    }
+    else if (atToken(identifier)) {
       advanceLexerSkippingWhitespaces();
       if (atToken(LEFT_ROUND_BRACKET)) {
         advanceLexerSkippingWhitespaces();
@@ -672,6 +670,10 @@ public class VimScriptParser implements PsiParser {
         startMarker.error("')' expected.");
       }
 
+    }
+    else {
+      advanceToNewLineCharacter();
+      startMarker.error("Eror parsing expr9");
     }
     skipWhitespaces();
   }

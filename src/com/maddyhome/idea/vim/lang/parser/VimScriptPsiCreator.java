@@ -39,7 +39,14 @@ public class VimScriptPsiCreator {
       return new LetStatement(node);
     }
 
-    if (VimScriptElementTypes.ASSIGNMENT_STMT.equals(elementType)) {
+    if (VimScriptElementTypes.ASSIGNMENT_STMT.equals(elementType) ||
+      VimScriptElementTypes.TERNARY_EXPRESSION.equals(elementType) ||
+      VimScriptElementTypes.OR_EXPRESSION.equals(elementType) ||
+      VimScriptElementTypes.AND_EXPRESSION.equals(elementType) ||
+      VimScriptElementTypes.COMPARISON_EXPRESSION.equals(elementType) ||
+      VimScriptElementTypes.PLUS_MINUS_DOT_EXPRESSION.equals(elementType) ||
+      VimScriptElementTypes.MULT_DIV_MOD_EXPRESSION.equals(elementType) ||
+      VimScriptElementTypes.UNARY_EXPRESSION.equals(elementType) ) {
       return new PsiVimScriptElementImpl(node);
     }
 
