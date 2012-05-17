@@ -547,10 +547,13 @@ public class VimScriptParser implements PsiParser {
   private void parseUnaryExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     if (atToken(OP_PLUS, OP_MINUS, EXCLAMATION_MARK)) {
       advanceLexerSkippingWhitespaces();
+      PsiBuilder.Marker mark = builder.mark();
+      parseCollectionElemExpression(mark, isNested);
+      startMarker.done(UNARY_EXPRESSION);
     }
-    PsiBuilder.Marker expr = builder.mark();
-    parseCollectionElemExpression(expr, isNested);
-    startMarker.done(UNARY_EXPRESSION);
+    else {
+      parseCollectionElemExpression(startMarker, isNested);
+    }
   }
 
   private void parseCollectionElemExpression(PsiBuilder.Marker startMarker, boolean isNested) {

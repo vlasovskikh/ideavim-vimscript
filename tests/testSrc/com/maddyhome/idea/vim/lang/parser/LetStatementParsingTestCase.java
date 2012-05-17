@@ -34,4 +34,8 @@ public class LetStatementParsingTestCase extends VimScriptParsingTestCase {
   public void testLetVarListItem() { doParserTest("let list_item = list[ id ]"); }
   public void testLetVarSublist() { doParserTest("let sublist = list[ 1 : 10 ]"); }
   public void testLetVarDictEntry() { doParserTest("let entry = eng2ru.hello"); }
+
+  public void testLetVarUnary0() { doParserTest("let var = +r "); }
+  public void testLetVarUnary1() { doParserTest("let rev = -ver "); }
+  public void testLetVarUnary2() { doParserTest("let inv = !v "); }
 }
