@@ -1,0 +1,16 @@
+VimScriptFile
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
+    PsiWhiteSpace(' ')
+    PsiVimScriptElementImpl(assignment statement)
+      Variable(variable)
+        PsiElement(identifier)('var')
+      PsiWhiteSpace(' ')
+      PsiElement(=)('=')
+      PsiWhiteSpace(' ')
+      PsiVimScriptToken:nested expression
+        PsiElement(()('(')
+        PsiVimScriptToken:value
+          PsiElement(int)('15')
+        PsiElement())(')')

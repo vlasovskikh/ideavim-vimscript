@@ -27,6 +27,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -97,6 +98,9 @@ public class KeyHandler {
    * @param context The data context
    */
   public void handleKey(Editor editor, KeyStroke key, DataContext context) {
+    // All the editor actions should be performed with top level editor!!!
+    // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
+    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     logger.debug("handleKey " + key);
     CommandState editorState = CommandState.getInstance(editor);
     boolean isRecording = editorState.isRecording();

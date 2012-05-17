@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -70,7 +69,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public String endSearchCommand(final Editor editor, DataContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(false);
+    panel.deactivate();
 
     final Project project = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
     SwingUtilities.invokeLater(new Runnable() {
@@ -132,7 +131,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public boolean processExEntry(final Editor editor, final DataContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(false);
+    panel.deactivate();
     boolean res = true;
     int flags = 0;
     try {
@@ -145,7 +144,7 @@ public class ProcessGroup extends AbstractActionGroup {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
         if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
-          CommandGroups.getInstance().getMotion().exitVisual(editor);
+          CommandGroups.getInstance().getMotion().exitVisual(editor, true);
         }
       }
       else {
@@ -203,7 +202,7 @@ public class ProcessGroup extends AbstractActionGroup {
     CommandState.getInstance(editor).popState();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(false);
+    panel.deactivate();
     final Project project = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -250,7 +249,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public boolean executeFilter(Editor editor, DataContext context, TextRange range, String command) throws IOException {
     if (logger.isDebugEnabled()) logger.debug("command=" + command);
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     StringReader car = new StringReader(chars.subSequence(range.getStartOffset(),
                                                           range.getEndOffset()).toString());
     StringWriter sw = new StringWriter();

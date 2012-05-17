@@ -1,0 +1,13 @@
+VimScriptFile
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
+    PsiWhiteSpace(' ')
+    Variable(variable)
+      PsiElement(identifier)('var1')
+    PsiWhiteSpace(' ')
+    Variable(variable)
+      PsiElement(register)('@var2')
+    PsiWhiteSpace(' ')
+    Variable(variable)
+      PsiElement(identifier)('var3')

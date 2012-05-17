@@ -1,0 +1,9 @@
+VimScriptFile
+  SetStatement(set statement)
+    Keyword(keyword)
+      PsiElement(identifier)('set')
+    PsiWhiteSpace(' ')
+    SetOption(option)
+      PsiElement(identifier)('opt')
+      PsiElement(=)('=')
+      PsiElement(identifier)('val')

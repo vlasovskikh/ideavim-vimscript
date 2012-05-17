@@ -1,0 +1,5 @@
+VimScriptFile
+  SetStatement(set statement)
+    Keyword(keyword)
+      PsiElement(identifier)('set')
+  PsiElement(NEW_LINE_INDENT)('\n')

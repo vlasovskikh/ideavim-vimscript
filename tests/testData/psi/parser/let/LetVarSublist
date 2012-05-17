@@ -1,0 +1,27 @@
+VimScriptFile
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
+    PsiWhiteSpace(' ')
+    PsiVimScriptElementImpl(assignment statement)
+      Variable(variable)
+        PsiElement(identifier)('sublist')
+      PsiWhiteSpace(' ')
+      PsiElement(=)('=')
+      PsiWhiteSpace(' ')
+      PsiVimScriptToken:subcollection expression
+        Variable(variable)
+          PsiElement(identifier)('list')
+        PsiElement([)('[')
+        PsiWhiteSpace(' ')
+        PsiVimScriptToken:collection item id expression
+          PsiVimScriptToken:value
+            PsiElement(int)('1')
+          PsiWhiteSpace(' ')
+        PsiElement(:)(':')
+        PsiWhiteSpace(' ')
+        PsiVimScriptToken:collection item id expression
+          PsiVimScriptToken:value
+            PsiElement(int)('10')
+          PsiWhiteSpace(' ')
+        PsiElement(])(']')

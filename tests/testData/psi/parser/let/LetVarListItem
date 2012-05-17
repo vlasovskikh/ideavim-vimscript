@@ -1,0 +1,21 @@
+VimScriptFile
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
+    PsiWhiteSpace(' ')
+    PsiVimScriptElementImpl(assignment statement)
+      Variable(variable)
+        PsiElement(identifier)('list_item')
+      PsiWhiteSpace(' ')
+      PsiElement(=)('=')
+      PsiWhiteSpace(' ')
+      PsiVimScriptToken:collection item expression
+        Variable(variable)
+          PsiElement(identifier)('list')
+        PsiElement([)('[')
+        PsiWhiteSpace(' ')
+        PsiVimScriptToken:collection item id expression
+          Variable(variable)
+            PsiElement(identifier)('id')
+          PsiWhiteSpace(' ')
+        PsiElement(])(']')

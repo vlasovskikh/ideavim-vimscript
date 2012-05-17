@@ -1,0 +1,5 @@
+VimScriptFile
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
+  PsiElement(NEW_LINE_INDENT)('\n')

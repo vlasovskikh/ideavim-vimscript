@@ -1,0 +1,8 @@
+VimScriptFile
+  LetStatement(let statement)
+    Keyword(keyword)
+      PsiElement(identifier)('let')
+    PsiWhiteSpace(' ')
+    Variable(variable)
+      PsiElement(identifier)('var')
+  PsiElement(NEW_LINE_INDENT)('\n')

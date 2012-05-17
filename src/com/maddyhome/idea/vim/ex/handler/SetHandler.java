@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.option.Options;
 
 /**
- *
+ * Handler for 'set' command.
  */
 public class SetHandler extends CommandHandler {
   public SetHandler() {
@@ -41,7 +41,7 @@ public class SetHandler extends CommandHandler {
       logger.debug("arg=" + arg);
     }
 
-    return Options.getInstance().parseOptionLine(editor, cmd.getArgument(), true);
+    return Options.getInstance().parseOptionLine(editor, cmd, true);
   }
 
   private static Logger logger = Logger.getInstance(SetHandler.class.getName());

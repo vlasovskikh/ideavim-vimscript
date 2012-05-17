@@ -1,0 +1,4 @@
+VimScriptFile
+  SetStatement(set statement)
+    Keyword(keyword)
+      PsiElement(identifier)('set')
