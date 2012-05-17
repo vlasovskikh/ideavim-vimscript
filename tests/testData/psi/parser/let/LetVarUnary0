@@ -13,4 +13,4 @@ VimScriptFile
         PsiElement(+)('+')
         Variable(variable)
           PsiElement(identifier)('r')
-        PsiWhiteSpace(' ')
+    PsiWhiteSpace(' ')

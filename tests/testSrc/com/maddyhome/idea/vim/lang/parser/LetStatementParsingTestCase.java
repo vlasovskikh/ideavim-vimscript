@@ -38,4 +38,8 @@ public class LetStatementParsingTestCase extends VimScriptParsingTestCase {
   public void testLetVarUnary0() { doParserTest("let var = +r "); }
   public void testLetVarUnary1() { doParserTest("let rev = -ver "); }
   public void testLetVarUnary2() { doParserTest("let inv = !v "); }
+
+  public void testLetVarMult() { doParserTest("let var = 13 * a"); }
+  public void testLetVarDiv() { doParserTest("let var = dividend / divisor "); }
+  public void testLetVarMod() { doParserTest("let var = num % modulo "); }
 }
