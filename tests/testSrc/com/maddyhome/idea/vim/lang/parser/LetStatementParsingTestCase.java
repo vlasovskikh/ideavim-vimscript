@@ -25,8 +25,13 @@ public class LetStatementParsingTestCase extends VimScriptParsingTestCase {
   public void testLetVarNumber() { doParserTest("let var=12"); }
   public void testLetVarString0() { doParserTest("let var = \"Hello\""); }
   public void testLetVarString1() { doParserTest("let var = 'Hello'"); }
-  public void testLetVarVariable() { doParserTest("let var = another_variable"); }
+  public void testLetVarVariable0() { doParserTest("let var = another_variable"); }
+  public void testLetVarVariable1() { doParserTest("let var = another_variable  "); }
   public void testLetVarNested() { doParserTest("let var = (15)"); }
   public void testLetVarFuncCall0() { doParserTest("let a = get_a()"); }
   public void testLetVarFuncCall1() { doParserTest("let a = get_a(d, e)"); }
+
+  public void testLetVarListItem() { doParserTest("let list_item = list[ id ]"); }
+  public void testLetVarSublist() { doParserTest("let sublist = list[ 1 : 10 ]"); }
+  public void testLetVarDictEntry() { doParserTest("let entry = eng2ru.hello"); }
 }

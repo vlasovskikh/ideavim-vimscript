@@ -332,13 +332,13 @@ public class VimScriptParser implements PsiParser {
 
   private boolean parseExpression(PsiBuilder.Marker startMarker) {
     //parseTernaryExpression(startMarker, false);
-    parseCollectionElemExpression(startMarker, false);
+    parseUnaryExpression(startMarker, false);
     return true;
   }
 
   private boolean parseExpression(PsiBuilder.Marker startMarker, boolean isNested) {
     //parseTernaryExpression(startMarker, isNested);
-    parseCollectionElemExpression(startMarker, isNested);
+    parseUnaryExpression(startMarker, isNested);
     return true;
   }
 
@@ -573,20 +573,22 @@ public class VimScriptParser implements PsiParser {
         }
       }
       else if (atToken(LEFT_SQUARE_BRACKET)) {
+        startMarker.done(VARIABLE);
+        startMarker = startMarker.precede();
         // list item or sublist
-        advanceLexer();
+        advanceLexerSkippingWhitespaces();
         PsiBuilder.Marker elemId = builder.mark();
         parseExpression(elemId, true);
         if (atToken(RIGHT_SQUARE_BRACKET)) {
-          startMarker.done(COLLECTION_ITEM_ID_EXPRESSION);
-          startMarker = startMarker.precede();
+          elemId = elemId.precede();
+          elemId.done(COLLECTION_ITEM_ID_EXPRESSION);
           advanceLexer();
           startMarker.done(COLLECTION_ITEM_EXPRESSION);
 
         }
         else if (atToken(COLON)) {
-          startMarker.done(COLLECTION_ITEM_ID_EXPRESSION);
-          startMarker = startMarker.precede();
+          elemId = elemId.precede();
+          elemId.done(COLLECTION_ITEM_ID_EXPRESSION);
           advanceLexerSkippingWhitespaces();
           elemId = builder.mark();
           parseExpression(elemId);
@@ -608,7 +610,9 @@ public class VimScriptParser implements PsiParser {
 
       }
       else {
-        parseLowestLevelExpression(startMarker, isNested);
+        startMarker.rollbackTo();
+        PsiBuilder.Marker mark = builder.mark();
+        parseLowestLevelExpression(mark, isNested);
       }
     }
     else {
@@ -624,11 +628,14 @@ public class VimScriptParser implements PsiParser {
 
     }
     else if (atToken(identifier)) {
-      advanceLexerSkippingWhitespaces();
+      advanceLexer();
+      PsiBuilder.Marker afterIdentifier = builder.mark();
+      skipWhitespaces();
       if (atToken(LEFT_ROUND_BRACKET)) {
         advanceLexerSkippingWhitespaces();
         if (atToken(RIGHT_ROUND_BRACKET)) {
           advanceLexer();
+          afterIdentifier.drop();
           startMarker.done(FUNCTION_CALL);
 
         }
@@ -641,11 +648,13 @@ public class VimScriptParser implements PsiParser {
             }
             else if (atToken(RIGHT_ROUND_BRACKET)) {
               advanceLexer();
+              afterIdentifier.drop();
               startMarker.done(FUNCTION_CALL);
               break;
             }
             else {
               advanceToNewLineCharacter();
+              afterIdentifier.drop();
               startMarker.error("Invalid function call.");
               break;
             }
@@ -654,6 +663,7 @@ public class VimScriptParser implements PsiParser {
 
       }
       else {
+        afterIdentifier.rollbackTo();
         startMarker.done(VARIABLE);
       }
 
